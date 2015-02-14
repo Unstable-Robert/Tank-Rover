@@ -109,18 +109,6 @@ void loop()
     if (BTLEserial.available()) {
         for (int x = 0; x < 4; x++) {
             myBytes[x] = BTLEserial.read();
-            if (x == 1) {
-                digitalWrite(MotorOneSped, 255);
-                Serial.print("MotorOneSped: ");Serial.println(myBytes[x]);
-                Serial.print("MotorOne A1: ");Serial.print(analogRead(MotorOneAPin1));
-                Serial.print(" A2: ");Serial.println(analogRead(MotorOneAPin2));
-            }
-            if (x == 3) {
-                digitalWrite(MotorTwoSped, 255);
-                Serial.print("MotorTwoSped: ");Serial.println(myBytes[x]);
-                Serial.print("MotorTwo A1: ");Serial.print(analogRead(MotorTwoAPin1));
-                Serial.print(" A2: ");Serial.println(analogRead(MotorTwoAPin2));
-            }
         }
     }
 
@@ -136,6 +124,12 @@ void loop()
         digitalWrite(MotorOnePin4, LOW);
         digitalWrite(MotorOnePin3, HIGH);
     }
+    if (myBytes[1] != 0x00) {
+        digitalWrite(MotorOneSped, myBytes[1]);
+        Serial.print("MotorOneSped: ");Serial.println(myBytes[1]);
+//        Serial.print("MotorOne A1: ");Serial.print(analogRead(MotorOneAPin1));
+//        Serial.print(" A2: ");Serial.println(analogRead(MotorOneAPin2));
+    }
 
     if (myBytes[2]  == 0x00) {
         digitalWrite(MotorTwoPin2, LOW);
@@ -148,6 +142,12 @@ void loop()
     if (myBytes[2] == 0x02) {
         digitalWrite(MotorTwoPin2, LOW);
         digitalWrite(MotorTwoPin1, HIGH);
+    }
+    if (myBytes[3] != 0x00) {
+        digitalWrite(MotorTwoSped, myBytes[3]);
+        Serial.print("MotorTwoSped: ");Serial.println(myBytes[3]);
+//        Serial.print("MotorTwo A1: ");Serial.print(analogRead(MotorTwoAPin1));
+//        Serial.print(" A2: ");Serial.println(analogRead(MotorTwoAPin2));
     }
   }
 }
