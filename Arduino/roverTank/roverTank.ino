@@ -4,8 +4,8 @@ This is an example for our nRF8001 Bluetooth Low Energy Breakout
   Pick one up today in the adafruit shop!
   ------> http://www.adafruit.com/products/1697
 
-Adafruit invests time and resources providing this open source code, 
-please support Adafruit and open-source hardware by purchasing 
+Adafruit invests time and resources providing this open source code,
+please support Adafruit and open-source hardware by purchasing
 products from Adafruit!
 
 Written by Kevin Townsend/KTOWN  for Adafruit Industries.
@@ -32,30 +32,35 @@ All text above, and the splash screen below must be included in any redistributi
 #define MotorTwoPin1 3
 #define MotorTwoSped 5
 
+#define MotorTwoAPin1 A0
+#define MotorTwoAPin2 A1
+
+#define MotorOneAPin1 A3
+#define MotorOneAPin2 A4
+
 Adafruit_BLE_UART BTLEserial = Adafruit_BLE_UART(ADAFRUITBLE_REQ, ADAFRUITBLE_RDY, ADAFRUITBLE_RST);
-char gChar[4];
 /**************************************************************************/
 /*!
     Configure the Arduino and start advertising with the radio
 */
 /**************************************************************************/
 void setup(void)
-{ 
+{
   Serial.begin(9600);
   while(!Serial); // Leonardo/Micro should wait for serial init
   Serial.println(F("Adafruit Bluefruit Low Energy nRF8001 Print echo demo"));
 
   //BTLEserial.setDeviceName("TANK!!"); /* 7 characters max! */
-  
+
   BTLEserial.begin();
   pinMode(MotorOnePin4, OUTPUT);
   pinMode(MotorOnePin3, OUTPUT);
   pinMode(MotorOneSped, OUTPUT);
-  
+
   pinMode(MotorTwoPin2, OUTPUT);
   pinMode(MotorTwoPin1, OUTPUT);
   pinMode(MotorTwoSped, OUTPUT);
-  
+
 }
 
 /**************************************************************************/
@@ -83,11 +88,11 @@ void loop()
     }
     if (status == ACI_EVT_DISCONNECTED) {
         Serial.println(F("* Disconnected or advertising timed out"));
-        digitalWrite(MotorTwoPin2, HIGH);
-        digitalWrite(MotorTwoPin1, HIGH);
-        digitalWrite(MotorOnePin4, HIGH);
-        digitalWrite(MotorOnePin3, HIGH);
-        
+        digitalWrite(MotorTwoPin2, LOW);
+        digitalWrite(MotorTwoPin1, LOW);
+        digitalWrite(MotorOnePin4, LOW);
+        digitalWrite(MotorOnePin3, LOW);
+
     }
     // OK set the last status change to this one
     laststatus = status;
@@ -99,56 +104,50 @@ void loop()
       Serial.print("* "); Serial.print(BTLEserial.available()); Serial.println(F(" bytes available from BTLE"));
     }
     // OK while we still have something to read, get a character and print it out
-    byte leftMotorDir;
-    byte leftMotorSpd;
-    byte rightMotorDir;
-    byte rightMotorSpd;
+    int myBytes[4];
+
     if (BTLEserial.available()) {
-        leftMotorDir = BTLEserial.read();
-        Serial.print("leftMotorDir: ");Serial.println(leftMotorDir, HEX);
-        leftMotorSpd = BTLEserial.read();
-        Serial.print("leftMotorSpd: ");Serial.println(leftMotorSpd, HEX);
-        rightMotorDir = BTLEserial.read();
-        Serial.print("rightMotorDir: ");Serial.println(rightMotorDir, HEX);
-        rightMotorSpd = BTLEserial.read();
-        Serial.print("rightMotorSpd: ");Serial.println(rightMotorSpd, HEX);
+        for (int x = 0; x < 4; x++) {
+            myBytes[x] = BTLEserial.read();
+            if (x == 1) {
+                digitalWrite(MotorOneSped, 255);
+                Serial.print("MotorOneSped: ");Serial.println(myBytes[x]);
+                Serial.print("MotorOne A1: ");Serial.print(analogRead(MotorOneAPin1));
+                Serial.print(" A2: ");Serial.println(analogRead(MotorOneAPin2));
+            }
+            if (x == 3) {
+                digitalWrite(MotorTwoSped, 255);
+                Serial.print("MotorTwoSped: ");Serial.println(myBytes[x]);
+                Serial.print("MotorTwo A1: ");Serial.print(analogRead(MotorTwoAPin1));
+                Serial.print(" A2: ");Serial.println(analogRead(MotorTwoAPin2));
+            }
+        }
     }
-    
-    if (leftMotorDir == 0x00) {
-        digitalWrite(MotorOnePin4, HIGH);
-        digitalWrite(MotorOnePin3, HIGH);
+
+    if (myBytes[0] == 0x00) {
+        digitalWrite(MotorOnePin4, LOW);
+        digitalWrite(MotorOnePin3, LOW);
     }
-    if (leftMotorDir == 0x01) {
+    if (myBytes[0] == 0x01) {
         digitalWrite(MotorOnePin4, HIGH);
         digitalWrite(MotorOnePin3, LOW);
     }
-    if (leftMotorDir == 0x02) {
+    if (myBytes[0] == 0x02) {
         digitalWrite(MotorOnePin4, LOW);
         digitalWrite(MotorOnePin3, HIGH);
     }
-    if (leftMotorSpd != 0x00) {
-        //digitalWrite(MotorTwoSped, HIGH);
-        analogWrite(MotorOneSped, leftMotorSpd);
+
+    if (myBytes[2]  == 0x00) {
+        digitalWrite(MotorTwoPin2, LOW);
+        digitalWrite(MotorTwoPin1, LOW);
     }
-    
-    
-    
-    if (rightMotorDir == 0x00) {
-        digitalWrite(MotorTwoPin2, HIGH);
-        digitalWrite(MotorTwoPin1, HIGH);
-    }
-    if (rightMotorDir == 0x01) {
+    if (myBytes[2] == 0x01) {
         digitalWrite(MotorTwoPin2, HIGH);
         digitalWrite(MotorTwoPin1, LOW);
     }
-    if (rightMotorDir == 0x02) {
+    if (myBytes[2] == 0x02) {
         digitalWrite(MotorTwoPin2, LOW);
         digitalWrite(MotorTwoPin1, HIGH);
     }
-    if (rightMotorSpd != 0x00) {
-        //digitalWrite(MotorTwoSped, HIGH);
-        analogWrite(MotorTwoSped, rightMotorSpd);
-    }
   }
 }
-
