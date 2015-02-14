@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C106a" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="xKz-8o-TGb">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="zSp-1g-oiN">
+            <objects>
+                <navigationController id="xKz-8o-TGb" sceneMemberID="viewController">
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina55"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="c1V-4Y-F97">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" id="WcB-Rj-wc6">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
+                    <connections>
+                        <segue destination="vXZ-lx-hvc" kind="relationship" relationship="rootViewController" id="xaA-mD-kQv"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="YVZ-L6-aC9" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-956" y="246"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="ufC-wZ-h7g">
+            <objects>
+                <viewController id="vXZ-lx-hvc" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="jyV-Pf-zRb"/>
+                        <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="k5g-OA-CvP">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="vXZ-lx-hvc" id="FXm-A8-dvg"/>
+                                    <outlet property="delegate" destination="vXZ-lx-hvc" id="v5a-HY-t1T"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="k5g-OA-CvP" firstAttribute="bottom" secondItem="2fi-mo-0CV" secondAttribute="top" id="8eZ-G1-DOu"/>
+                            <constraint firstAttribute="trailing" secondItem="k5g-OA-CvP" secondAttribute="trailing" id="hsS-Gj-aNO"/>
+                            <constraint firstItem="k5g-OA-CvP" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="top" id="vSZ-Ra-7eW"/>
+                            <constraint firstItem="k5g-OA-CvP" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="vxo-Zd-kAh"/>
+                        </constraints>
+                    </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="jVx-y9-H9Y"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina55"/>
+                    <connections>
+                        <outlet property="tbl_data" destination="k5g-OA-CvP" id="csc-iZ-U7U"/>
+                        <segue destination="zNw-u3-fGa" kind="show" identifier="ScanToPeripheral" id="H4R-1x-gJY"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-320" y="246"/>
+        </scene>
+        <!--Peripheral View Controller-->
+        <scene sceneID="dW8-L0-3LC">
+            <objects>
+                <viewController id="zNw-u3-fGa" customClass="PeripheralViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Uuc-1f-281"/>
+                        <viewControllerLayoutGuide type="bottom" id="7hT-2U-oBW"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="q4h-Zt-lv1">
+                        <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view autoresizesSubviews="NO" contentMode="center" translatesAutoresizingMaskIntoConstraints="NO" id="6Jl-e4-7OI" customClass="JoyStick">
+                                <rect key="frame" x="25" y="72" width="300" height="295"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="D1A-KO-CJZ" appends="YES" id="5Jd-nb-EaJ"/>
+                                </connections>
+                            </view>
+                            <view autoresizesSubviews="NO" contentMode="center" translatesAutoresizingMaskIntoConstraints="NO" id="AK1-kZ-DfM" customClass="JoyStick">
+                                <rect key="frame" x="351" y="72" width="300" height="295"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="wO5-lw-GeV" appends="YES" id="3ys-3N-rsI"/>
+                                </connections>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="6Jl-e4-7OI" firstAttribute="top" secondItem="Uuc-1f-281" secondAttribute="bottom" constant="8" symbolic="YES" id="1FJ-3x-2zB"/>
+                            <constraint firstItem="AK1-kZ-DfM" firstAttribute="top" secondItem="6Jl-e4-7OI" secondAttribute="top" id="2c6-Ot-21P"/>
+                            <constraint firstItem="AK1-kZ-DfM" firstAttribute="trailing" secondItem="q4h-Zt-lv1" secondAttribute="trailingMargin" id="Eur-xG-zr0"/>
+                            <constraint firstItem="AK1-kZ-DfM" firstAttribute="leading" secondItem="q4h-Zt-lv1" secondAttribute="leading" constant="351" id="fro-gl-wck"/>
+                            <constraint firstItem="6Jl-e4-7OI" firstAttribute="leading" secondItem="q4h-Zt-lv1" secondAttribute="leadingMargin" constant="9" id="gIE-BB-aa7"/>
+                            <constraint firstItem="7hT-2U-oBW" firstAttribute="top" secondItem="AK1-kZ-DfM" secondAttribute="bottom" constant="8" symbolic="YES" id="gsM-Xw-Ogx"/>
+                            <constraint firstItem="AK1-kZ-DfM" firstAttribute="leading" secondItem="6Jl-e4-7OI" secondAttribute="trailing" constant="26" id="oam-41-MiQ"/>
+                            <constraint firstItem="7hT-2U-oBW" firstAttribute="top" secondItem="6Jl-e4-7OI" secondAttribute="bottom" constant="8" symbolic="YES" id="tt0-qw-SHv"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="5FL-JR-hDW">
+                        <nil key="title"/>
+                    </navigationItem>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                    <connections>
+                        <outlet property="leftJoyStick" destination="6Jl-e4-7OI" id="PbI-WD-uA6"/>
+                        <outlet property="leftTouch" destination="D1A-KO-CJZ" id="hSv-kO-PgA"/>
+                        <outlet property="rightJoyStick" destination="AK1-kZ-DfM" id="GEP-cB-BoS"/>
+                        <outlet property="rightTouch" destination="wO5-lw-GeV" id="hkK-Vq-NNp"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VMb-fW-82j" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <panGestureRecognizer cancelsTouchesInView="NO" delaysTouchesEnded="NO" minimumNumberOfTouches="1" maximumNumberOfTouches="1" id="wO5-lw-GeV">
+                    <connections>
+                        <action selector="rightTouchBegins:" destination="zNw-u3-fGa" id="0pK-Ag-JXf"/>
+                        <outlet property="delegate" destination="zNw-u3-fGa" id="zyq-CE-0V3"/>
+                    </connections>
+                </panGestureRecognizer>
+                <panGestureRecognizer cancelsTouchesInView="NO" delaysTouchesEnded="NO" minimumNumberOfTouches="1" maximumNumberOfTouches="1" id="D1A-KO-CJZ">
+                    <connections>
+                        <action selector="leftTouchBegin:" destination="zNw-u3-fGa" id="Ugt-51-jPn"/>
+                        <outlet property="delegate" destination="zNw-u3-fGa" id="DTO-or-hJB"/>
+                    </connections>
+                </panGestureRecognizer>
+            </objects>
+            <point key="canvasLocation" x="-319.5" y="935.5"/>
+        </scene>
+    </scenes>
+</document>
