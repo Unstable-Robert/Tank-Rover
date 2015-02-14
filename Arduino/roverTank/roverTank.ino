@@ -85,7 +85,7 @@ void loop()
         Serial.println(F("* Disconnected or advertising timed out"));
         digitalWrite(MotorTwoPin2, HIGH);
         digitalWrite(MotorTwoPin1, HIGH);
-                                             digitalWrite(MotorOnePin4, HIGH);
+        digitalWrite(MotorOnePin4, HIGH);
         digitalWrite(MotorOnePin3, HIGH);
         
     }
@@ -99,53 +99,56 @@ void loop()
       Serial.print("* "); Serial.print(BTLEserial.available()); Serial.println(F(" bytes available from BTLE"));
     }
     // OK while we still have something to read, get a character and print it out
-    byte myHex[4];
-    int len = BTLEserial.available();
-    int x = 0;
-    while (BTLEserial.available()) {
-        byte c = BTLEserial.read();
-        myHex[x] = (c,HEX);
-        x++;
-        Serial.print("c: ");Serial.print(c,HEX);Serial.print("   ");
-        Serial.print("myChar: ");Serial.println(myHex[x],HEX);
+    byte leftMotorDir;
+    byte leftMotorSpd;
+    byte rightMotorDir;
+    byte rightMotorSpd;
+    if (BTLEserial.available()) {
+        leftMotorDir = BTLEserial.read();
+        Serial.print("leftMotorDir: ");Serial.println(leftMotorDir, HEX);
+        leftMotorSpd = BTLEserial.read();
+        Serial.print("leftMotorSpd: ");Serial.println(leftMotorSpd, HEX);
+        rightMotorDir = BTLEserial.read();
+        Serial.print("rightMotorDir: ");Serial.println(rightMotorDir, HEX);
+        rightMotorSpd = BTLEserial.read();
+        Serial.print("rightMotorSpd: ");Serial.println(rightMotorSpd, HEX);
     }
     
-    if (myHex[0] == 0x00) {
-        digitalWrite(MotorOnePin4, LOW);
-        digitalWrite(MotorOnePin3, LOW);
+    if (leftMotorDir == 0x00) {
+        digitalWrite(MotorOnePin4, HIGH);
+        digitalWrite(MotorOnePin3, HIGH);
     }
-    if (myHex[0] == 0x01) {
+    if (leftMotorDir == 0x01) {
         digitalWrite(MotorOnePin4, HIGH);
         digitalWrite(MotorOnePin3, LOW);
     }
-    if (myHex[0] == 0x02) {
+    if (leftMotorDir == 0x02) {
         digitalWrite(MotorOnePin4, LOW);
         digitalWrite(MotorOnePin3, HIGH);
     }
-    if (myHex[1] != 0x00) {
+    if (leftMotorSpd != 0x00) {
         //digitalWrite(MotorTwoSped, HIGH);
-        analogWrite(MotorOneSped, (myHex[1]));
+        analogWrite(MotorOneSped, leftMotorSpd);
     }
     
     
     
-    if (myHex[0] == 0x00) {
-        digitalWrite(MotorTwoPin2, LOW);
-        digitalWrite(MotorTwoPin1, LOW);
+    if (rightMotorDir == 0x00) {
+        digitalWrite(MotorTwoPin2, HIGH);
+        digitalWrite(MotorTwoPin1, HIGH);
     }
-    if (myHex[2] == 0x01) {
+    if (rightMotorDir == 0x01) {
         digitalWrite(MotorTwoPin2, HIGH);
         digitalWrite(MotorTwoPin1, LOW);
     }
-    if (myHex[2] == 0x02) {
+    if (rightMotorDir == 0x02) {
         digitalWrite(MotorTwoPin2, LOW);
         digitalWrite(MotorTwoPin1, HIGH);
     }
-    if (myHex[3] != 0x00) {
+    if (rightMotorSpd != 0x00) {
         //digitalWrite(MotorTwoSped, HIGH);
-        analogWrite(MotorTwoSped, (myHex[3]));
+        analogWrite(MotorTwoSped, rightMotorSpd);
     }
   }
 }
-
 
