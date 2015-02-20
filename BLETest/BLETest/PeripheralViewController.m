@@ -18,12 +18,15 @@
     UInt8 rightMotorDir;
     UInt8 leftMotorSpeed;
     UInt8 rightMotorSpeed;
+    
+    CFTimeInterval timer;
 }
 
 @end
 static NSString *TXUUID = @"6e400002-b5a3-f393-e0a9-e50e24dcca9e";
 static NSString *RXUUID = @"6e400003-b5a3-f393-e0a9-e50e24dcca9e";
 static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+static double delay = 0.5;
 
 @implementation PeripheralViewController
 @synthesize toConnect, bleAdapter,leftJoyStick,rightJoyStick,leftTouch,rightTouch;
@@ -36,6 +39,7 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     [self.bleAdapter setDelegate:self];
     leftJoyStick.height = 0.5;
     rightJoyStick.height = 0.5;
+    timer = CACurrentMediaTime();
 }
 
 
@@ -82,6 +86,13 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 #pragma mark - Handling Hex Values 
 
 - (void)updateHexValues {
+    CFTimeInterval ref = CACurrentMediaTime() - timer;
+    NSLog(@"%f", ref);
+    if (ref >= delay) {
+        timer =CACurrentMediaTime();
+        [self sendNewValues];
+    }
+
     if (leftMotorDir != leftJoyStick.getDirection) {
         leftMotorDir = leftJoyStick.getDirection;
     }
