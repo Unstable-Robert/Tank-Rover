@@ -20,6 +20,7 @@
     UInt8 rightMotorSpeed;
     
     CFTimeInterval timer;
+    BOOL sendNewData;
 }
 
 @end
@@ -40,6 +41,11 @@ static double delay = 0.5;
     leftJoyStick.height = 0.5;
     rightJoyStick.height = 0.5;
     timer = CACurrentMediaTime();
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        while (sendNewData) {
+            [self myThreadMethod];
+        }
+    });
 }
 
 
@@ -53,9 +59,22 @@ static double delay = 0.5;
     self.toConnect = peripheral;
 }
 
+- (void)myThreadMethod {
+    CFTimeInterval ref = CACurrentMediaTime() - timer;
+    NSLog(@"HERE %f", ref);
+    while (ref >= delay) {
+        NSLog(@"In Da Loop");
+        timer =CACurrentMediaTime();
+        if (sendNewData) {
+            [self sendNewValues];
+        }
+    }
+}
+
 #pragma mark - Handling Touches
 
 - (IBAction)leftTouchBegin:(id)sender {
+    sendNewData = YES;
     CGPoint loc = [leftTouch locationInView:leftJoyStick];
     if (loc.y > 0) {
         CGFloat value = fabsf(loc.y / leftJoyStick.frame.size.height);
@@ -66,6 +85,7 @@ static double delay = 0.5;
 }
 
 - (IBAction)rightTouchBegins:(id)sender {
+    sendNewData = YES;
     CGPoint loc = [rightTouch locationInView:rightJoyStick];
     if (loc.y > 0) {
         CGFloat value = fabsf(loc.y / rightJoyStick.frame.size.height);
@@ -76,6 +96,7 @@ static double delay = 0.5;
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    sendNewData = NO;
     leftJoyStick.height = 0.5;
     [leftJoyStick setNeedsDisplay];
     rightJoyStick.height = 0.5;
@@ -86,12 +107,12 @@ static double delay = 0.5;
 #pragma mark - Handling Hex Values 
 
 - (void)updateHexValues {
-    CFTimeInterval ref = CACurrentMediaTime() - timer;
-    NSLog(@"%f", ref);
-    if (ref >= delay) {
-        timer =CACurrentMediaTime();
-        [self sendNewValues];
-    }
+//    CFTimeInterval ref = CACurrentMediaTime() - timer;
+//    NSLog(@"%f", ref);
+//    if (ref >= delay) {
+//        timer =CACurrentMediaTime();
+//        [self sendNewValues];
+//    }
 
     if (leftMotorDir != leftJoyStick.getDirection) {
         leftMotorDir = leftJoyStick.getDirection;

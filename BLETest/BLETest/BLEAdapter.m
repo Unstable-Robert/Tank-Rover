@@ -55,7 +55,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
     CBUUID *cu = [CBUUID UUIDWithData:cd];
     CBService *service = [self findServiceFromUUID:su p:p];
     if (!service) {
-        NSLog(@"Could not find service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:su],[self CBUUIDToNSString:p.UUID]);
+        NSLog(@"Could not find service with UUID %s on peripheral with UUID %@\r\n",[self CBUUIDToString:su],[self CBUUIDToNSString:p.UUID]);
         return;
     }
     CBCharacteristic *characteristic = [self findCharacteristicFromUUID:cu service:service];
@@ -185,7 +185,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
     
     if (self->CM.state  != CBCentralManagerStatePoweredOn) {
         printf("CoreBluetooth not correctly initialized !\r\n");
-        printf("State = %d (%s)\r\n",self->CM.state,[self centralManagerStateToString:self.CM.state]);
+        printf("State = %ld (%s)\r\n",self->CM.state,[self centralManagerStateToString:self.CM.state]);
         return -1;
     }
     
@@ -262,7 +262,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 - (void) scanTimer:(NSTimer *)timer {
     [self.CM stopScan];
     printf("Stopped Scanning\r\n");
-    printf("Known peripherals : %d\r\n",[self->peripherals count]);
+    printf("Known peripherals : %lu\r\n",(unsigned long)[self->peripherals count]);
     [self printKnownPeripherals];
 }
 

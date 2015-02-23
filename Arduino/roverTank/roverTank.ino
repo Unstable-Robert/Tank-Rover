@@ -36,6 +36,9 @@ void setup(void) {
 aci_evt_opcode_t laststatus = ACI_EVT_DISCONNECTED;
 
 void loop() {
+  unsigned long currentMillis = millis();
+  unsigned long previousMillis;
+  unsigned long interval = 1000;
   BTLEserial.pollACI();
   aci_evt_opcode_t status = BTLEserial.getState();
   if (status != laststatus) {
@@ -62,8 +65,15 @@ void loop() {
     }
     int myBytes[4];
     if (BTLEserial.available()) {
+        if(currentMillis - previousMillis> interval) {
+          previousMillis = currentMillis;
+          for (int x = 0; x < 4; x++) {
+            myBytes[x] = 0x00;
+          }
+        }
         for (int x = 0; x < 4; x++) {
           myBytes[x] = BTLEserial.read();
+          previousMillis = currentMillis;
         }
         if (myBytes[0] == 0x00) {
           digitalWrite(MotorOnePin4, LOW);
