@@ -77,7 +77,7 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
         CGFloat value = fabsf(loc.y / leftJoyStick.frame.size.height);
         leftJoyStick.height = value;
         [leftJoyStick setNeedsDisplay];
-        [self updateHexValues];
+        if ([self updateHexValues]) [self sendNewValues];
     }
 }
 
@@ -88,7 +88,7 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
         CGFloat value = fabsf(loc.y / rightJoyStick.frame.size.height);
         rightJoyStick.height = value;
         [rightJoyStick setNeedsDisplay];
-        [self updateHexValues];
+        if ([self updateHexValues]) [self sendNewValues];
     }
 }
 
@@ -105,29 +105,25 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 
 #pragma mark - Handling Hex Values 
 
-- (void)updateHexValues {
-//    CFTimeInterval ref = CACurrentMediaTime() - timer;
-//    NSLog(@"%f", ref);
-//    if (ref >= delay) {
-//        timer =CACurrentMediaTime();
-//        [self sendNewValues];
-//    }
-
+- (BOOL)updateHexValues {
+    BOOL x = false;
     if (leftMotorDir != leftJoyStick.getDirection) {
         leftMotorDir = leftJoyStick.getDirection;
+        x = true;
     }
     if (leftMotorSpeed != leftJoyStick.getSpeed) {
         leftMotorSpeed = leftJoyStick.getSpeed;
-        [self sendNewValues];
+        x = true;
     }
     if (rightMotorDir != rightJoyStick.getDirection) {
         rightMotorDir = rightJoyStick.getDirection;
+        x = true;
     }
     if (rightMotorSpeed != rightJoyStick.getSpeed) {
         rightMotorSpeed = rightJoyStick.getSpeed;
-        [self sendNewValues];
+        x = true;
     }
-
+    return x;
 }
 
 #pragma mark - Bluetooth Communication
