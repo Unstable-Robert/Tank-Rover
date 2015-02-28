@@ -19,7 +19,6 @@
     UInt8 leftMotorSpeed;
     UInt8 rightMotorSpeed;
     
-    CFTimeInterval timer;
     BOOL sendNewData;
 }
 
@@ -27,7 +26,6 @@
 static NSString *TXUUID = @"6e400002-b5a3-f393-e0a9-e50e24dcca9e";
 static NSString *RXUUID = @"6e400003-b5a3-f393-e0a9-e50e24dcca9e";
 static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-static double delay = 0.5;
 
 @implementation PeripheralViewController
 @synthesize toConnect, bleAdapter,leftJoyStick,rightJoyStick,leftTouch,rightTouch;
@@ -40,12 +38,12 @@ static double delay = 0.5;
     [self.bleAdapter setDelegate:self];
     leftJoyStick.height = 0.5;
     rightJoyStick.height = 0.5;
-    timer = CACurrentMediaTime();
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        while (sendNewData) {
-            [self myThreadMethod];
-        }
-    });
+    
+    [NSTimer scheduledTimerWithTimeInterval:1.0
+                                     target:self
+                                   selector:@selector(myThreadMethod)
+                                   userInfo:nil
+                                    repeats:YES];
 }
 
 
@@ -60,14 +58,13 @@ static double delay = 0.5;
 }
 
 - (void)myThreadMethod {
-    CFTimeInterval ref = CACurrentMediaTime() - timer;
-    NSLog(@"HERE %f", ref);
-    while (ref >= delay) {
-        NSLog(@"In Da Loop");
-        timer =CACurrentMediaTime();
-        if (sendNewData) {
-            [self sendNewValues];
-        }
+    if (sendNewData) {
+        NSLog(@"sendNewData");
+        [self updateHexValues];
+        [self sendNewValues];
+    } else {
+        NSLog(@"stopMotors");
+        [self stopMotors];
     }
 }
 
@@ -96,11 +93,13 @@ static double delay = 0.5;
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    NSLog(@"touches ended");
     sendNewData = NO;
     leftJoyStick.height = 0.5;
     [leftJoyStick setNeedsDisplay];
     rightJoyStick.height = 0.5;
     [rightJoyStick setNeedsDisplay];
+    
     [self stopMotors];
 }
 
@@ -143,7 +142,11 @@ static double delay = 0.5;
 }
 
 - (void)stopMotors {
-    char bytes[] = {0x00,0x00,0x00,0x00};
+    leftMotorDir = 0x00;
+    leftMotorSpeed = 0x00;
+    rightMotorSpeed = 0x00;
+    rightMotorDir = 0x00;
+    char bytes[] = {leftMotorDir,leftMotorSpeed,rightMotorDir,rightMotorSpeed};
     NSData *data = [NSData dataWithBytes:bytes length:4];
     [self sendDataString:data];
 }
