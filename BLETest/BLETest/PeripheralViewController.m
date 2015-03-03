@@ -106,24 +106,24 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 #pragma mark - Handling Hex Values 
 
 - (BOOL)updateHexValues {
-    BOOL x = false;
+    BOOL update = false;
     if (leftMotorDir != leftJoyStick.getDirection) {
         leftMotorDir = leftJoyStick.getDirection;
-        x = true;
+        update = true;
     }
     if (leftMotorSpeed != leftJoyStick.getSpeed) {
         leftMotorSpeed = leftJoyStick.getSpeed;
-        x = true;
+        update = true;
     }
     if (rightMotorDir != rightJoyStick.getDirection) {
         rightMotorDir = rightJoyStick.getDirection;
-        x = true;
+        update = true;
     }
     if (rightMotorSpeed != rightJoyStick.getSpeed) {
         rightMotorSpeed = rightJoyStick.getSpeed;
-        x = true;
+        update = true;
     }
-    return x;
+    return update;
 }
 
 #pragma mark - Bluetooth Communication
