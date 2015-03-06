@@ -34,35 +34,17 @@
 }
 
 -(UInt8)getSpeed {
-    CGFloat temp = (self.height * 256);
-    if ((temp > 0) && (temp < 31)){
-        return 0xFE;                    //255
+    CGFloat temp = (self.height * 100) + 100;
+    if ((temp >= 190) && (temp <= 200)){
+        return 0xC8;                    //200
     }
-    if ((temp > 32) && (temp < 63)){
-        return 0xBF;                    //191
+    if ((temp >= 140) && (temp <= 160)){
+        return 0x96;                    //150
     }
-    if ((temp > 64) && (temp < 95)){
-        return 0x7F;                    //127
+    if ((temp >= 100) && (temp <= 110)){
+        return 0x64;                    //100
     }
-    if ((temp > 96) && (temp < 127)){
-        return 0x3F;                    //63
-    }
-    if (temp == 128){
-        return 0x00;                    //00
-    }
-    if ((temp > 129) && (temp < 159)){
-        return 0x3F;                    //63
-    }
-    if ((temp > 160) && (temp < 191)){
-        return 0x7F;                    //127
-    }
-    if ((temp > 192) && (temp < 223)){
-        return 0xBF;                    //191
-    }
-    if ((temp > 224) && (temp < 256)){
-        return 0xFE;                    //255
-    }
-    return 0;
+    return temp;
 }
 
 @end
