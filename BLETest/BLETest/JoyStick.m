@@ -38,9 +38,6 @@
     if ((temp >= 190) && (temp <= 200)){
         return 0xC8;                    //200
     }
-    if ((temp >= 140) && (temp <= 160)){
-        return 0x96;                    //150
-    }
     if ((temp >= 100) && (temp <= 110)){
         return 0x64;                    //100
     }

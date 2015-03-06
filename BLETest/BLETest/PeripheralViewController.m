@@ -128,8 +128,8 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 
 #pragma mark - Bluetooth Communication
 - (void)sendNewValues {
-    char bytes[] = {leftMotorDir,leftMotorSpeed,rightMotorDir,rightMotorSpeed};
-    NSData *data = [NSData dataWithBytes:bytes length:4];
+    char bytes[] = {leftMotorSpeed, rightMotorSpeed};
+    NSData *data = [NSData dataWithBytes:bytes length:2];
     NSLog(@"%@", data);
     if (leftMotorSpeed != 0x00 || rightMotorSpeed != 0x00) {
      [self sendDataString:data];
@@ -138,12 +138,12 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 }
 
 - (void)stopMotors {
-    leftMotorDir = 0x00;
-    leftMotorSpeed = 0x00;
-    rightMotorSpeed = 0x00;
-    rightMotorDir = 0x00;
-    char bytes[] = {leftMotorDir,leftMotorSpeed,rightMotorDir,rightMotorSpeed};
-    NSData *data = [NSData dataWithBytes:bytes length:4];
+//    leftMotorDir = 0x00;
+    leftMotorSpeed = 0x96;
+    rightMotorSpeed = 0x96;
+//    rightMotorDir = 0x00;
+    char bytes[] = {leftMotorSpeed,rightMotorSpeed};
+    NSData *data = [NSData dataWithBytes:bytes length:2];
     [self sendDataString:data];
 }
 
