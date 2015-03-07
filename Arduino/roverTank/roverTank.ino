@@ -12,6 +12,10 @@
 #define BLUELED 8
 #define PINGSERVO 5
 
+#define CENTER 85
+#define LEFT 167
+#define RIGHT 1
+
 Servo ps;
 Servo rm;
 Servo lm;
@@ -21,7 +25,7 @@ int myBytes[2];
 unsigned long interval = 3000;
 unsigned long currentMillis = millis();
 unsigned long previousMillis;
-boolean AIMode = false;
+boolean AIMode = true;
 
 Adafruit_BLE_UART BTLEserial = Adafruit_BLE_UART(ADAFRUITBLE_REQ, ADAFRUITBLE_RDY, ADAFRUITBLE_RST);
 
@@ -37,36 +41,73 @@ void setup(void) {
   lm.attach(LEFTMOTOR);
   ps.attach(PINGSERVO);
   ps.write(90);
-
+  delay(2000);
 }
 
 aci_evt_opcode_t laststatus = ACI_EVT_DISCONNECTED;
 
 void loop() {
   currentMillis = millis();
-  if (getPingSensorDistance() < 30) {
+  long distance = getPingSensorDistance();
+  if (distance < 30) {
     digitalWrite(BLUELED, HIGH);
+    while(getPingSensorDistance() < 40) {
+      setMotorSpeed(1700, 1700);
+      delay(30);
+    }
+    setMotorSpeed(1500, 1500);
+    if (AIMode) findNextDirection();
   } else {
+    if (AIMode) setMotorSpeed(1300, 1300);
     digitalWrite(BLUELED, LOW);
   }
   checkBTStatus();
   if (status == ACI_EVT_CONNECTED) {
     if (!AIMode) {
       handlingBT();
-    } else {
-      // do ai sutff here
     }
+    //add something here to check if user turned off ai mode via bluetooth
   }
   delay(20);
-//  ps.write(167);
-//  delay(1500);
-//  ps.write(85);
-//  delay(1500);
-//  ps.write(1);
-//  delay(1500);
-
+}
+void findNextDirection() {
+  long right = getRightDistance();
+  Serial.print("Right: ");Serial.println(right);
+  long left = getLeftDistance();
+  Serial.print("Left: ");Serial.println(left);
+  
+  if ((left > 30) || (right > 30)) {
+    if (left > right) {
+      turnLeft();
+    } else if (right > left) {
+      turnRight();
+    } else {
+      reverseFor(300);
+      findNextDirection();
+    }
+    
+  } else {
+    while(getPingSensorDistance() < 50) {
+      setMotorSpeed(1700, 1700);
+      delay(30);
+    }
+  }
+}
+long getRightDistance() {
+  ps.write(1);
+  long distanceR = getPingSensorDistance();
+  ps.write(85);
+  delay(20);
+  return distanceR;
 }
 
+long getLeftDistance() {
+  ps.write(167);
+  long distanceL = getPingSensorDistance();
+  ps.write(85);
+  delay(20);
+  return distanceL;
+}
 
 long getPingSensorDistance() {
   pinMode(PINGSENSOR, OUTPUT);
@@ -82,8 +123,9 @@ long getPingSensorDistance() {
 void handlingBT() {
   if(currentMillis - previousMillis> interval) {
       previousMillis = currentMillis;
+      interval = 3000;
       for (int x = 0; x < 2; x++) {
-        myBytes[x] = 0x00;
+        myBytes[x] = 0x96;
       }
   }
   if (BTLEserial.available() == 2) {
@@ -106,6 +148,11 @@ void turnLeft() {
 void turnRight() {
     setMotorSpeed(2000, 1000);
   delay(500);
+  setMotorSpeed(1500, 1500);
+}
+void reverseFor(int time) {
+  setMotorSpeed(1700, 1700);
+  delay(time);
   setMotorSpeed(1500, 1500);
 }
 void checkBTStatus() {
