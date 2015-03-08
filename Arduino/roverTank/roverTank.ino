@@ -41,12 +41,14 @@ void setup(void) {
   lm.attach(LEFTMOTOR);
   ps.attach(PINGSERVO);
   ps.write(90);
-  delay(2000);
+  delay(3000);
 }
 
 aci_evt_opcode_t laststatus = ACI_EVT_DISCONNECTED;
 
 void loop() {
+    turnLeft();
+    delay(5000);
   currentMillis = millis();
   long distance = getPingSensorDistance();
   if (distance < 30) {
@@ -73,6 +75,7 @@ void loop() {
 void findNextDirection() {
   long right = getRightDistance();
   Serial.print("Right: ");Serial.println(right);
+  delay(500);
   long left = getLeftDistance();
   Serial.print("Left: ");Serial.println(left);
   
@@ -95,17 +98,19 @@ void findNextDirection() {
 }
 long getRightDistance() {
   ps.write(1);
+  delay(300);
   long distanceR = getPingSensorDistance();
+  delay(100);
   ps.write(85);
-  delay(20);
   return distanceR;
 }
 
 long getLeftDistance() {
   ps.write(167);
+  delay(300);
   long distanceL = getPingSensorDistance();
+  delay(100);
   ps.write(85);
-  delay(20);
   return distanceL;
 }
 
@@ -141,12 +146,12 @@ void setMotorSpeed(int left, int right) {
   rm.writeMicroseconds(right);
 }
 void turnLeft() {
-  setMotorSpeed(1000, 2000);
-  delay(500);
+  setMotorSpeed(2000, 1000);
+  delay(423);
   setMotorSpeed(1500, 1500);
 }
 void turnRight() {
-    setMotorSpeed(2000, 1000);
+  setMotorSpeed(1000, 2000);
   delay(500);
   setMotorSpeed(1500, 1500);
 }
