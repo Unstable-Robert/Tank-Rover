@@ -47,8 +47,6 @@ void setup(void) {
 aci_evt_opcode_t laststatus = ACI_EVT_DISCONNECTED;
 
 void loop() {
-    turnLeft();
-    delay(5000);
   currentMillis = millis();
   long distance = getPingSensorDistance();
   if (distance < 30) {
@@ -67,8 +65,16 @@ void loop() {
   if (status == ACI_EVT_CONNECTED) {
     if (!AIMode) {
       handlingBT();
+    } else {
+      if (BTLEserial.available()){
+        for (int x = 0; x < 2; x++) {
+          myBytes[x] = BTLEserial.read();
+          if (myBytes[x] != 0x96) AIMode = false;
+          previousMillis = currentMillis;
+        }
+        
+      }
     }
-    //add something here to check if user turned off ai mode via bluetooth
   }
   delay(20);
 }
@@ -97,7 +103,7 @@ void findNextDirection() {
   }
 }
 long getRightDistance() {
-  ps.write(1);
+  ps.write(167);
   delay(300);
   long distanceR = getPingSensorDistance();
   delay(100);
@@ -106,7 +112,7 @@ long getRightDistance() {
 }
 
 long getLeftDistance() {
-  ps.write(167);
+  ps.write(1);
   delay(300);
   long distanceL = getPingSensorDistance();
   delay(100);
