@@ -13,8 +13,8 @@
 #define PINGSERVO 5
 
 #define CENTER 85
-#define LEFT 167
-#define RIGHT 1
+#define LEFT 1
+#define RIGHT 167
 
 Servo ps;
 Servo rm;
@@ -33,10 +33,10 @@ void setup(void) {
   Serial.begin(9600);
   while(!Serial);
   Serial.println(F("Adafruit Bluefruit Low Energy nRF8001 Print echo demo"));
-  
+
   BTLEserial.begin();
   pinMode(BLUELED, OUTPUT);
-  
+
   rm.attach(RIGHTMOTOR);
   lm.attach(LEFTMOTOR);
   ps.attach(PINGSERVO);
@@ -52,13 +52,13 @@ void loop() {
   if (distance < 30) {
     digitalWrite(BLUELED, HIGH);
     while(getPingSensorDistance() < 40) {
-      setMotorSpeed(1700, 1700);
+      setMotorSpeed(1600, 1600);
       delay(30);
     }
     setMotorSpeed(1500, 1500);
     if (AIMode) findNextDirection();
   } else {
-    if (AIMode) setMotorSpeed(1300, 1300);
+    if (AIMode) setMotorSpeed(1200, 1200);
     digitalWrite(BLUELED, LOW);
   }
   checkBTStatus();
@@ -72,7 +72,7 @@ void loop() {
           if (myBytes[x] != 0x96) AIMode = false;
           previousMillis = currentMillis;
         }
-        
+
       }
     }
   }
@@ -84,39 +84,37 @@ void findNextDirection() {
   delay(500);
   long left = getLeftDistance();
   Serial.print("Left: ");Serial.println(left);
-  
+
   if ((left > 30) || (right > 30)) {
     if (left > right) {
       turnLeft();
     } else if (right > left) {
       turnRight();
     } else {
-      reverseFor(300);
-      findNextDirection();
+      reverseFor(200);
     }
-    
   } else {
-    while(getPingSensorDistance() < 50) {
-      setMotorSpeed(1700, 1700);
+    while(getPingSensorDistance() < 40) {
+      setMotorSpeed(1600, 1600);
       delay(30);
     }
   }
 }
 long getRightDistance() {
-  ps.write(167);
+  ps.write(RIGHT);
   delay(300);
   long distanceR = getPingSensorDistance();
   delay(100);
-  ps.write(85);
+  ps.write(CENTER);
   return distanceR;
 }
 
 long getLeftDistance() {
-  ps.write(1);
+  ps.write(LEFT);
   delay(300);
   long distanceL = getPingSensorDistance();
   delay(100);
-  ps.write(85);
+  ps.write(CENTER);
   return distanceL;
 }
 
@@ -130,7 +128,7 @@ long getPingSensorDistance() {
   long duration = pulseIn(PINGSENSOR,HIGH);
   return duration / 29 / 2;
 }
-  
+
 void handlingBT() {
   if(currentMillis - previousMillis> interval) {
       previousMillis = currentMillis;
@@ -158,7 +156,7 @@ void turnLeft() {
 }
 void turnRight() {
   setMotorSpeed(1000, 2000);
-  delay(500);
+  delay(423);
   setMotorSpeed(1500, 1500);
 }
 void reverseFor(int time) {
