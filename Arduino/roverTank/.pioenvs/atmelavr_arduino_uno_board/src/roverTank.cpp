@@ -91,7 +91,9 @@ void setup(void) {
 }
 
 void loop() {
-    currentMillis = millis();
+    setMotorSpeed(1700, 1300);
+    Serial.println(getCurrentHeading());
+    /*currentMillis = millis();
     long distance = getPingSensorDistance();
     if (distance < 30) {
         digitalWrite(BLUELED, HIGH);
@@ -99,7 +101,7 @@ void loop() {
             setMotorSpeed(1600, 1600);
             delay(30);
         }
-        setMotorSpeed(1400, 1400);
+        setMotorSpeed(1500, 1500);
         if (AIMode) findNextDirection();
     } else {
         if (AIMode) setMotorSpeed(1400, 1400);
@@ -119,8 +121,8 @@ void loop() {
 
         }
     }
-  }
-  delay(20);
+  }*/
+  /*delay(20);*/
 }
 void findNextDirection() {
     long right = getRightDistance();
@@ -176,11 +178,13 @@ int getCurrentHeading() {
     sensors_event_t event;
     sensors_vec_t   orientation;
     mag.getEvent(&event);
-    if (dof.magGetOrientation(SENSOR_AXIS_Z, &event, &orientation)) {
-        /* 'orientation' should have valid .heading data now */
-        return orientation.heading;
+    float Pi = 3.14159;
+    // Calculate the angle of the vector y,x
+    float heading = (atan2(event.magnetic.y,event.magnetic.x) * 180) / Pi;
+    if (heading < 0) {
+    heading = 360 + heading;
     }
-    return -1;
+    return (int)heading;
 }
 int getLeftHeading(int heading) {  //subtract 90
     int newHeading = heading - 90;
@@ -219,23 +223,23 @@ void setMotorSpeed(int left, int right) {
     rm.writeMicroseconds(right);
 }
 void turnLeft(int heading) {
-    while((getCurrentHeading() > getLeftHeading(heading) + 5) || (getCurrentHeading() < getLeftHeading(heading) - 5)){
+    while((getCurrentHeading() > getLeftHeading(heading))){
         Serial.print("TURNINGHeading: ");Serial.println(getCurrentHeading());
         Serial.print("TurnLeftHeading: ");Serial.println(getLeftHeading(heading));
         if (getCurrentHeading() < getLeftHeading(heading) + 20) {
             Serial.println("TURNEDTOOO MUCHHHHHH");
         }
         setMotorSpeed(1700, 1300);
-        delay(500);
+        /*delay(500);*/
     }
     setMotorSpeed(1500, 1500);
 }
 void turnRight(int heading) {
-    while((getCurrentHeading() > getRightHeading(heading) + 5) || (getCurrentHeading() < getRightHeading(heading) - 5)){
+    while((getCurrentHeading() < getRightHeading(heading))){
         Serial.print("TURNINGHeading: ");Serial.println(getCurrentHeading());
         Serial.print("TurnRightHeading: ");Serial.println(getRightHeading(heading));
         setMotorSpeed(1300, 1700);
-        delay(500);
+        /*delay(500);*/
     }
     setMotorSpeed(1500, 1500);
 }
