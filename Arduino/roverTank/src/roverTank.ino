@@ -49,19 +49,23 @@ void setup(void) {
     mag.begin();
     BTLEserial.begin();
     pinMode(BLUELED, OUTPUT);
-
+    pinMode(3, INPUT);
     rm.attach(RIGHTMOTOR);
     lm.attach(LEFTMOTOR);
     ps.attach(PINGSERVO);
     ps.write(CENTER);
     delay(3000);
+    attachInterrupt(1, buttonPressed, RISING);
     Serial.print("Done with Setup");
 }
 
 void loop() {
-  /*runningLoop();*/
+  runningLoop();
   /*testTurning();*/
   /*testingCompass();*/
+}
+void buttonPressed() {
+    Serial.println("ButtonPressed");
 }
 void testTurning() {
     turnLeft(getCurrentHeading());
@@ -70,18 +74,19 @@ void testTurning() {
     Serial.println(getCurrentHeading());
 }
 void testingCompass() {
+    setMotorSpeed(1200, 1800);
     Serial.println(getCurrentHeading());     //values go from 0 - 359 outside of chasie
 }
 void runningLoop() {
     currentMillis = millis();
     long distance = getPingSensorDistance();
-    Serial.println(distance);
     if (distance < 30) {
         digitalWrite(BLUELED, HIGH);
-        while(getPingSensorDistance() < 40) {
+        while(getPingSensorValue() < 40) {
             Serial.println("<30 Backing up");
-            setMotorSpeed(1400, 1400);
+            setMotorSpeed(1300, 1300);
             delay(30);
+            /*setMotorSpeed(1500, 1500);*/
         }
         setMotorSpeed(1500, 1500);
         if (AIMode) findNextDirection();
@@ -91,6 +96,7 @@ void runningLoop() {
     }
     checkBTStatus();
     if (status == ACI_EVT_CONNECTED) {
+        /*sendBTInfo(distance, getCurrentHeading());*/
         if (!AIMode) {
         handlingBT();
         } else {
@@ -105,6 +111,14 @@ void runningLoop() {
     }
   }
 }
+void sendBTInfo(long dist, int heading) {
+    String send ="{" + String(heading) + ","+ String(dist) + "} ";
+    /*Serial.println(send);
+    Serial.println(send.length());*/
+    uint8_t buf[send.length()];
+    send.getBytes(buf, send.length());
+    BTLEserial.write(buf, send.length());
+}
 void findNextDirection() {
     long right = getRightDistance();
     Serial.print("Right: ");Serial.println(right);
@@ -113,9 +127,11 @@ void findNextDirection() {
     Serial.print("Left: ");Serial.println(left);
     if ((left > 30) || (right > 30)) {
         if (left > right) {
-            turnLeft(getCurrentHeading());
+            turnTo(getLeftHeading(getCurrentHeading()), LEFT);
+            /*turnLeft(getCurrentHeading());*/
         } else if (right > left) {
-            turnRight(getCurrentHeading());
+            turnTo(getRightHeading(getCurrentHeading()), RIGHT);
+            /*turnRight(getCurrentHeading());*/
         } else {
             while(getPingSensorDistance() < 50) {
                 setMotorSpeed(1400, 1400);
@@ -126,6 +142,31 @@ void findNextDirection() {
         while(getPingSensorDistance() < 50) {
             setMotorSpeed(1400, 1400);
             delay(30);
+        }
+    }
+}
+void turnTo(int heading, int dir) {
+    boolean turning = true;
+    int delayTime = 200;
+    while (turning) {
+        if (dir == LEFT) {
+            setMotorSpeed(1800, 1200);
+            delay(delayTime);
+            setMotorSpeed(1500, 1500);
+        }
+        if (dir == RIGHT) {
+            setMotorSpeed(1200, 1800);
+            delay(delayTime);
+            setMotorSpeed(1500, 1500);
+        }
+        if (((heading - 10) <= getCurrentHeading()) && ((heading + 10) >= getCurrentHeading())) {
+            delayTime = 100;
+        }
+        Serial.print("CurrentHeading: "); Serial.println(getCurrentHeading());
+        Serial.print("Heading: "); Serial.println(heading);
+        delay(300);
+        if (((heading - 2) <= getCurrentHeading()) && ((heading + 2) >= getCurrentHeading())) {
+            turning = false;
         }
     }
 }
@@ -148,6 +189,18 @@ long getLeftDistance() {
 }
 
 long getPingSensorDistance() {
+    long val1 = getPingSensorValue();
+    delay(300);
+    long val2 = getPingSensorValue();
+    delay(300);
+    long val3 = getPingSensorValue();
+    delay(300);
+    long val4 = getPingSensorValue();
+    delay(300);
+    long com = val1 + val2 + val3 + val4;
+    return com/4;
+}
+long getPingSensorValue() {
     pinMode(PINGSENSOR, OUTPUT);
     digitalWrite(PINGSENSOR, LOW);
     delayMicroseconds(2);
@@ -157,7 +210,6 @@ long getPingSensorDistance() {
     long duration = pulseIn(PINGSENSOR,HIGH);
     return duration / 29 / 2;
 }
-
 int getCurrentHeading() {
     sensors_event_t event;
     sensors_vec_t   orientation;
@@ -211,7 +263,7 @@ void turnLeft(int heading) {
     while(getCurrentHeading() < getLeftHeading(heading)){
         Serial.print("TURNINGHeading: ");Serial.println(getCurrentHeading());
         Serial.print("TurnLeftHeading: ");Serial.println(getLeftHeading(heading));
-        setMotorSpeed(1200, 1800);
+
         /*delay(10);
         setMotorSpeed(1500, 1500);*/
         /*delay(200);*/

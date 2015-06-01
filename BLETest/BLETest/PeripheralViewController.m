@@ -146,6 +146,8 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     NSData *data = [NSData dataWithBytes:bytes length:2];
     [self sendDataString:data];
 }
+- (void)readData {
+}
 
 - (void)sendDataString:(NSData *)tempData {
     [self.bleAdapter.activePeripheral writeValue:tempData

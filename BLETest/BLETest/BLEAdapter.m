@@ -726,6 +726,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     if (!error) {
+        NSLog(@"hjgjghjkhg");
         [[self delegate] OnReadDataChanged:YES : (CBCharacteristic*) characteristic];
     }
     else {
@@ -734,7 +735,6 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForDescriptor:(CBDescriptor *)descriptor error:(NSError *)error {
-    
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
