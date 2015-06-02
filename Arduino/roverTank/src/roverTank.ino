@@ -48,8 +48,6 @@ void setup(void) {
     Serial.println(F("Adafruit Bluefruit Low Energy nRF8001 Print echo demo"));
 
     mag.begin();
-    BTLEserial.setRXcallback(rxCallback);
-    BTLEserial.setACIcallback(aciCallback);
     BTLEserial.begin();
     pinMode(BLUELED, OUTPUT);
     rm.attach(RIGHTMOTOR);
@@ -88,6 +86,7 @@ void runningLoop() {
             Serial.println("<30 Backing up");
             setMotorSpeed(1300, 1300);
             delay(30);
+            /*setMotorSpeed(1500, 1500);*/
         }
         setMotorSpeed(1500, 1500);
         if (AIMode) findNextDirection();
@@ -95,58 +94,27 @@ void runningLoop() {
         if (AIMode) setMotorSpeed(1600, 1600);
         digitalWrite(BLUELED, LOW);
     }
-}
-void rxCallback(uint8_t *buffer, uint8_t len) {
+    checkBTStatus();
     if (status == ACI_EVT_CONNECTED) {
         /*sendBTInfo(distance, getCurrentHeading());*/
         if (!AIMode) {
-        handlingBT(buffer, len);
+        handlingBT();
         } else {
-        while (len > 0) {
+        if (BTLEserial.available()){
             for (int x = 0; x < 2; x++) {
-                myBytes[x] = buffer[x];
+                myBytes[x] = BTLEserial.read();
                 if (myBytes[x] != 0x96) AIMode = false;
                 previousMillis = currentMillis;
             }
-            len = len - 2;
-            }
-            if (!AIMode) runningLoop();
+
         }
     }
-}
-void handlingBT(uint8_t *buffer, uint8_t len) {
-    if(currentMillis - previousMillis> interval) {
-        previousMillis = currentMillis;
-        interval = 3000;
-        for (int x = 0; x < 2; x++) {
-            myBytes[x] = 0x96;
-        }
-    }
-    while (len > 0) {
-        for (int x = 0; x < 2; x++) {
-            myBytes[x] = buffer[x];
-            previousMillis = currentMillis;
-        }
-        len = len - 2;
-        setMotorSpeed(myBytes[0] * 10, myBytes[1] * 10);
-    }
-}
-void aciCallback(aci_evt_opcode_t event) {
-    status = event;
-    if (status != laststatus) {
-        if (status == ACI_EVT_CONNECTED) {
-            previousMillis = currentMillis;
-        }
-        if (status == ACI_EVT_DISCONNECTED) {
-            setMotorSpeed(1500, 1500);
-        }
-        laststatus = status;
-    }
+  }
 }
 void sendBTInfo(long dist, int heading) {
     String send ="{" + String(heading) + ","+ String(dist) + "} ";
-    Serial.println(send);
-    Serial.println(send.length());
+    /*Serial.println(send);
+    Serial.println(send.length());*/
     uint8_t buf[send.length()];
     send.getBytes(buf, send.length());
     BTLEserial.write(buf, send.length());
@@ -278,6 +246,23 @@ int getRightHeading(int heading) { //add 90
     if (!AIMode) runningLoop();
     return newHeading;
 }
+
+void handlingBT() {
+    if(currentMillis - previousMillis> interval) {
+        previousMillis = currentMillis;
+        interval = 3000;
+        for (int x = 0; x < 2; x++) {
+            myBytes[x] = 0x96;
+        }
+    }
+    if (BTLEserial.available() == 2) {
+        for (int x = 0; x < 2; x++) {
+            myBytes[x] = BTLEserial.read();
+            previousMillis = currentMillis;
+        }
+        setMotorSpeed(myBytes[0] * 10, myBytes[1] * 10);
+    }
+}
 void setMotorSpeed(int left, int right) {
     lm.writeMicroseconds(left);
     rm.writeMicroseconds(right);
@@ -286,4 +271,17 @@ void reverseFor(int time) {
     setMotorSpeed(1700, 1700);
     delay(time);
     setMotorSpeed(1500, 1500);
+}
+void checkBTStatus() {
+    BTLEserial.pollACI();
+    status = BTLEserial.getState();
+    if (status != laststatus) {
+    if (status == ACI_EVT_CONNECTED) {
+      previousMillis = currentMillis;
+    }
+    if (status == ACI_EVT_DISCONNECTED) {
+      setMotorSpeed(1500, 1500);
+    }
+    laststatus = status;
+    }
 }
