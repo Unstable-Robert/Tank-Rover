@@ -128,10 +128,8 @@ void findNextDirection() {
     if ((left > 30) || (right > 30)) {
         if (left > right) {
             turnTo(getLeftHeading(getCurrentHeading()), LEFT);
-            /*turnLeft(getCurrentHeading());*/
         } else if (right > left) {
             turnTo(getRightHeading(getCurrentHeading()), RIGHT);
-            /*turnRight(getCurrentHeading());*/
         } else {
             while(getPingSensorDistance() < 50) {
                 setMotorSpeed(1400, 1400);
@@ -145,6 +143,7 @@ void findNextDirection() {
         }
         findNextDirection();
     }
+    if (!AIMode) runningLoop();
 }
 void turnTo(int heading, int dir) {
     boolean turning = true;
@@ -174,9 +173,10 @@ void turnTo(int heading, int dir) {
         Serial.print("CurrentHeading: "); Serial.println(getCurrentHeading());
         Serial.print("Heading: "); Serial.println(heading);
         delay(300);
-        if (((heading - 2) <= getCurrentHeading()) && ((heading + 2) >= getCurrentHeading())) {
+        if (((heading - 1) <= getCurrentHeading()) && ((heading + 1) >= getCurrentHeading())) {
             turning = false;
         }
+        if (!AIMode) runningLoop();
     }
 }
 long getRightDistance() {
@@ -185,6 +185,7 @@ long getRightDistance() {
     long distanceR = getPingSensorDistance();
     delay(150);
     ps.write(CENTER);
+    if (!AIMode) runningLoop();
     return distanceR;
 }
 
@@ -194,6 +195,7 @@ long getLeftDistance() {
     long distanceL = getPingSensorDistance();
     delay(150);
     ps.write(CENTER);
+    if (!AIMode) runningLoop();
     return distanceL;
 }
 
@@ -233,6 +235,7 @@ int getLeftHeading(int heading) {  //subtract 90
     while (newHeading < 0) {
         newHeading = newHeading + 360;
     }
+    if (!AIMode) runningLoop();
     return newHeading;
 }
 int getRightHeading(int heading) { //add 90
@@ -240,6 +243,7 @@ int getRightHeading(int heading) { //add 90
     while (newHeading >= 360) {
         newHeading = newHeading - 360;
     }
+    if (!AIMode) runningLoop();
     return newHeading;
 }
 
