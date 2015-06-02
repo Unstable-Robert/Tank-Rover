@@ -42,6 +42,7 @@ boolean AIMode = true;
 Adafruit_BLE_UART BTLEserial = Adafruit_BLE_UART(ADAFRUITBLE_REQ, ADAFRUITBLE_RDY, ADAFRUITBLE_RST);
 
 void setup(void) {
+    attachInterrupt(1, buttonPressed, FALLING);
     Serial.begin(9600);
     while(!Serial);
     Serial.println(F("Adafruit Bluefruit Low Energy nRF8001 Print echo demo"));
@@ -49,13 +50,11 @@ void setup(void) {
     mag.begin();
     BTLEserial.begin();
     pinMode(BLUELED, OUTPUT);
-    pinMode(3, INPUT);
     rm.attach(RIGHTMOTOR);
     lm.attach(LEFTMOTOR);
     ps.attach(PINGSERVO);
     ps.write(CENTER);
     delay(3000);
-    attachInterrupt(1, buttonPressed, RISING);
     Serial.print("Done with Setup");
 }
 
@@ -68,7 +67,7 @@ void buttonPressed() {
     Serial.println("ButtonPressed");
 }
 void testTurning() {
-    turnLeft(getCurrentHeading());
+    turnTo(getLeftHeading(getCurrentHeading()), LEFT);
     delay(1000);
     Serial.println("turning again");
     Serial.println(getCurrentHeading());
@@ -79,7 +78,8 @@ void testingCompass() {
 }
 void runningLoop() {
     currentMillis = millis();
-    long distance = getPingSensorDistance();
+    long distance = getPingSensorValue();
+    Serial.print("Distance: "); Serial.println(distance);
     if (distance < 30) {
         digitalWrite(BLUELED, HIGH);
         while(getPingSensorValue() < 40) {
@@ -143,6 +143,7 @@ void findNextDirection() {
             setMotorSpeed(1400, 1400);
             delay(30);
         }
+        findNextDirection();
     }
 }
 void turnTo(int heading, int dir) {
@@ -150,14 +151,22 @@ void turnTo(int heading, int dir) {
     int delayTime = 200;
     while (turning) {
         if (dir == LEFT) {
-            setMotorSpeed(1800, 1200);
+            setMotorSpeed(1200, 1800);
             delay(delayTime);
             setMotorSpeed(1500, 1500);
         }
         if (dir == RIGHT) {
-            setMotorSpeed(1200, 1800);
+            setMotorSpeed(1800, 1200);
             delay(delayTime);
             setMotorSpeed(1500, 1500);
+        }
+        if ((dir == LEFT) && (getCurrentHeading() < heading) && (delayTime == 100)) {
+            dir = RIGHT;
+            delayTime = 50;
+        }
+        if ((dir == RIGHT) && (getCurrentHeading() > heading) && (delayTime == 100)) {
+            dir = LEFT;
+            delayTime = 50;
         }
         if (((heading - 10) <= getCurrentHeading()) && ((heading + 10) >= getCurrentHeading())) {
             delayTime = 100;
@@ -219,17 +228,17 @@ int getCurrentHeading() {
     }
     return -1;
 }
-int getLeftHeading(int heading) {  //add 90
-    int newHeading = heading + 90;
-    while (newHeading >= 360) {
-        newHeading = newHeading - 360;
-    }
-    return newHeading;
-}
-int getRightHeading(int heading) { //subtract 90
+int getLeftHeading(int heading) {  //subtract 90
     int newHeading = heading - 90;
     while (newHeading < 0) {
         newHeading = newHeading + 360;
+    }
+    return newHeading;
+}
+int getRightHeading(int heading) { //add 90
+    int newHeading = heading + 90;
+    while (newHeading >= 360) {
+        newHeading = newHeading - 360;
     }
     return newHeading;
 }
@@ -253,33 +262,6 @@ void handlingBT() {
 void setMotorSpeed(int left, int right) {
     lm.writeMicroseconds(left);
     rm.writeMicroseconds(right);
-}
-void turnLeft(int heading) {
-    long head = getCurrentHeading();
-    long nextHead = getLeftHeading(heading);
-    Serial.print("CurrentHeading: "); Serial.println(head);
-    Serial.print("Heading: "); Serial.println(heading);
-    Serial.print("TurningToo: "); Serial.println(nextHead);
-    while(getCurrentHeading() < getLeftHeading(heading)){
-        Serial.print("TURNINGHeading: ");Serial.println(getCurrentHeading());
-        Serial.print("TurnLeftHeading: ");Serial.println(getLeftHeading(heading));
-
-        /*delay(10);
-        setMotorSpeed(1500, 1500);*/
-        /*delay(200);*/
-    }
-    setMotorSpeed(1500, 1500);
-}
-void turnRight(int heading) {
-    while((getCurrentHeading() > getRightHeading(heading))){
-        Serial.print("TURNINGHeading: ");Serial.println(getCurrentHeading());
-        Serial.print("TurnRightHeading: ");Serial.println(getRightHeading(heading));
-        setMotorSpeed(1800, 1200);
-        /*delay(10);
-        setMotorSpeed(1500, 1500);*/
-        /*delay(200);*/
-    }
-    setMotorSpeed(1500, 1500);
 }
 void reverseFor(int time) {
     setMotorSpeed(1700, 1700);
