@@ -37,6 +37,8 @@ int myBytes[2];
 unsigned long interval = 3000;
 unsigned long currentMillis = millis();
 unsigned long previousMillis;
+long lastDebounceTime = 0;
+long debounceDelay = 100;
 boolean AIMode = true;
 
 Adafruit_BLE_UART BTLEserial = Adafruit_BLE_UART(ADAFRUITBLE_REQ, ADAFRUITBLE_RDY, ADAFRUITBLE_RST);
@@ -45,26 +47,52 @@ void setup(void) {
     attachInterrupt(1, buttonPressed, FALLING);
     Serial.begin(9600);
     while(!Serial);
-    Serial.println(F("Adafruit Bluefruit Low Energy nRF8001 Print echo demo"));
-
+    Serial.println();
+    startingUpCommand("Up");
+    startingUpCommand("Swagger");
     mag.begin();
+    startingUpCommand("Dooms Day Weapon");
     BTLEserial.begin();
     pinMode(BLUELED, OUTPUT);
+    startingUpCommand("Emotions");
     rm.attach(RIGHTMOTOR);
     lm.attach(LEFTMOTOR);
     ps.attach(PINGSERVO);
     ps.write(CENTER);
-    delay(3000);
+    startingUpCommand("Facial Reconition");
     Serial.print("Done with Setup");
+    delay(1000);
+}
+void startingUpCommand(String process) {
+    Serial.print("Booting " + process + "..");
+    int length = process.length() + 10;
+    for (int x = length; x < 35; x++) {
+        Serial.print(".");
+        delay(250);
+    }
+    Serial.println();
 }
 
 void loop() {
-  runningLoop();
+    aiLED();
+  /*runningLoop();*/
   /*testTurning();*/
   /*testingCompass();*/
+  /*rectangle();
+  delay(2000);*/
 }
-void buttonPressed() {
-    Serial.println("ButtonPressed");
+void rectangle() {
+    /*setMotorSpeed(1700, 1700);
+    delay(1000);
+    setMotorSpeed(1500, 1500);*/
+    turnTo(136, RIGHT);
+    delay(1000);
+    turnTo(237, RIGHT);
+    delay(1000);
+    turnTo(306, RIGHT);
+    delay(1000);
+    turnTo(10, RIGHT);
+    delay(1000);
 }
 void testTurning() {
     turnTo(getLeftHeading(getCurrentHeading()), LEFT);
@@ -73,10 +101,26 @@ void testTurning() {
     Serial.println(getCurrentHeading());
 }
 void testingCompass() {
-    setMotorSpeed(1200, 1800);
-    Serial.println(getCurrentHeading());     //values go from 0 - 359 outside of chasie
+    sensors_event_t event;
+    sensors_vec_t   orientation;
+    mag.getEvent(&event);
+    Serial.println("MAG");
+    if (dof.magGetOrientation(SENSOR_AXIS_Z, &event, &orientation)) {
+      Serial.print("HeadingZ: ");Serial.println(orientation.heading);
+    }
+    if (dof.magGetOrientation(SENSOR_AXIS_Y, &event, &orientation)) {
+      Serial.print("HeadingY: ");Serial.println(orientation.heading);
+    }
+    if (dof.magGetOrientation(SENSOR_AXIS_X, &event, &orientation)) {
+      Serial.print("HeadingX: ");Serial.println(orientation.heading);
+    }
+    Serial.print("X: "); Serial.print(event.magnetic.x); Serial.print("  ");
+    Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print("  ");
+    Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.print("  ");Serial.println("uT");
+    delay(2000);
 }
 void runningLoop() {
+    aiLED();
     currentMillis = millis();
     long distance = getPingSensorValue();
     Serial.print("Distance: "); Serial.println(distance);
@@ -106,10 +150,25 @@ void runningLoop() {
                 if (myBytes[x] != 0x96) AIMode = false;
                 previousMillis = currentMillis;
             }
+            if (!AIMode) handlingBT();
 
         }
     }
   }
+}
+void buttonPressed() {
+    if (millis() - lastDebounceTime > debounceDelay) {
+        AIMode = !AIMode;
+        Serial.print("ButtonPressed");Serial.println(AIMode);
+    }
+    lastDebounceTime = millis();
+}
+void aiLED() {
+    if (AIMode) {
+        digitalWrite(BLUELED, HIGH);
+    } else {
+        digitalWrite(BLUELED, LOW);
+    }
 }
 void sendBTInfo(long dist, int heading) {
     String send ="{" + String(heading) + ","+ String(dist) + "} ";
@@ -131,16 +190,11 @@ void findNextDirection() {
         } else if (right > left) {
             turnTo(getRightHeading(getCurrentHeading()), RIGHT);
         } else {
-            while(getPingSensorDistance() < 50) {
-                setMotorSpeed(1400, 1400);
-                delay(30);
-            }
+            reverseFor(300);
+            findNextDirection();
         }
     } else {
-        while(getPingSensorDistance() < 50) {
-            setMotorSpeed(1400, 1400);
-            delay(30);
-        }
+        reverseFor(300);
         findNextDirection();
     }
     if (!AIMode) runningLoop();
