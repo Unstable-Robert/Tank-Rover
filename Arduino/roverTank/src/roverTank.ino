@@ -51,6 +51,7 @@ void setup(void) {
     startingUpCommand("Up");
     startingUpCommand("Swagger");
     mag.begin();
+    accel.begin();
     startingUpCommand("Dooms Day Weapon");
     BTLEserial.begin();
     pinMode(BLUELED, OUTPUT);
@@ -74,8 +75,7 @@ void startingUpCommand(String process) {
 }
 
 void loop() {
-    aiLED();
-  /*runningLoop();*/
+  runningLoop();
   /*testTurning();*/
   /*testingCompass();*/
   /*rectangle();
@@ -108,6 +108,7 @@ void testingCompass() {
     if (dof.magGetOrientation(SENSOR_AXIS_Z, &event, &orientation)) {
       Serial.print("HeadingZ: ");Serial.println(orientation.heading);
     }
+    Serial.print("compensated HeadingZ: ");Serial.println(getCurrentHeading());
     if (dof.magGetOrientation(SENSOR_AXIS_Y, &event, &orientation)) {
       Serial.print("HeadingY: ");Serial.println(orientation.heading);
     }
@@ -135,8 +136,7 @@ void runningLoop() {
         setMotorSpeed(1500, 1500);
         if (AIMode) findNextDirection();
     } else {
-        if (AIMode) setMotorSpeed(1600, 1600);
-        digitalWrite(BLUELED, LOW);
+        if (AIMode) setMotorSpeed(1700, 1700);
     }
     checkBTStatus();
     if (status == ACI_EVT_CONNECTED) {
@@ -162,6 +162,7 @@ void buttonPressed() {
         Serial.print("ButtonPressed");Serial.println(AIMode);
     }
     lastDebounceTime = millis();
+    aiLED();
 }
 void aiLED() {
     if (AIMode) {
@@ -204,7 +205,7 @@ void turnTo(int heading, int dir) {
     int delayTime = 200;
     while (turning) {
         if (dir == LEFT) {
-            setMotorSpeed(1200, 1800);
+            setMotorSpeed(1100, 1800);
             delay(delayTime);
             setMotorSpeed(1500, 1500);
         }
@@ -213,6 +214,7 @@ void turnTo(int heading, int dir) {
             delay(delayTime);
             setMotorSpeed(1500, 1500);
         }
+        delay(800);
         if ((dir == LEFT) && (getCurrentHeading() < heading) && (delayTime == 100)) {
             dir = RIGHT;
             delayTime = 50;
@@ -226,7 +228,6 @@ void turnTo(int heading, int dir) {
         }
         Serial.print("CurrentHeading: "); Serial.println(getCurrentHeading());
         Serial.print("Heading: "); Serial.println(heading);
-        delay(300);
         if (((heading - 1) <= getCurrentHeading()) && ((heading + 1) >= getCurrentHeading())) {
             turning = false;
         }
@@ -275,7 +276,7 @@ long getPingSensorValue() {
     long duration = pulseIn(PINGSENSOR,HIGH);
     return duration / 29 / 2;
 }
-int getCurrentHeading() {
+/*int getCurrentHeading() {
     sensors_event_t event;
     sensors_vec_t   orientation;
     mag.getEvent(&event);
@@ -283,6 +284,21 @@ int getCurrentHeading() {
       return orientation.heading;
     }
     return -1;
+}*/
+int getCurrentHeading() {
+    sensors_event_t mag_event;
+    sensors_event_t accel_event;
+    sensors_vec_t   orientation;
+    mag.getEvent(&mag_event);
+    accel.getEvent(&accel_event);
+    if (dof.magTiltCompensation(SENSOR_AXIS_Z, &mag_event, &accel_event)) {
+        if (dof.magGetOrientation(SENSOR_AXIS_Z, &mag_event, &orientation)) {
+          return orientation.heading;
+        }
+        return -1;
+    } else {
+        return -1;
+    }
 }
 int getLeftHeading(int heading) {  //subtract 90
     int newHeading = heading - 90;
