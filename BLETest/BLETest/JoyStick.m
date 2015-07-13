@@ -16,12 +16,12 @@
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect {
     // Drawing code
-    [ThrottleImages drawJoyStickWithHeight:self.height windowHeight:self.frame.size.height];
+    [ThrottleImages drawJoyStickWithWindowWidth:self.frame.size.width windowHeight:self.frame.size.height throttleSpeed:self.height];
 }
 
 - (void)drawRect:(CGRect)rect withHeight:(CGFloat)height {
     // Drawing code
-    [ThrottleImages drawJoyStickWithHeight:height windowHeight:self.frame.size.height];
+    [ThrottleImages drawJoyStickWithWindowWidth:self.frame.size.width windowHeight:self.frame.size.height throttleSpeed:self.height];
 }
 
 -(UInt8)getDirection {

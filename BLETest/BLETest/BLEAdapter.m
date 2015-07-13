@@ -55,12 +55,12 @@ static BLEAdapter * _sharedBLEAdapter = nil;
     CBUUID *cu = [CBUUID UUIDWithData:cd];
     CBService *service = [self findServiceFromUUID:su p:p];
     if (!service) {
-        NSLog(@"Could not find service with UUID %s on peripheral with UUID %@\r\n",[self CBUUIDToString:su],[self CBUUIDToNSString:p.UUID]);
+        NSLog(@"Could not find service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:su],[self UUIDToString:CFBridgingRetain(p.identifier)]);
         return;
     }
     CBCharacteristic *characteristic = [self findCharacteristicFromUUID:cu service:service];
     if (!characteristic) {
-        NSLog(@"Could not find characteristic with UUID %s on service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:cu],[self CBUUIDToString:su],[self UUIDToString:p.UUID]);
+        NSLog(@"Could not find characteristic with UUID %s on service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:cu],[self CBUUIDToString:su],[self UUIDToString:CFBridgingRetain(p.identifier)]);
         return;
     }
     NSLog(@"Sending write command");
@@ -94,12 +94,12 @@ static BLEAdapter * _sharedBLEAdapter = nil;
     CBUUID *cu = [CBUUID UUIDWithData:cd];
     CBService *service = [self findServiceFromUUID:su p:p];
     if (!service) {
-        printf("Could not find service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:su],[self UUIDToString:p.UUID]);
+        printf("Could not find service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:su],[self UUIDToString:CFBridgingRetain(p.identifier)]);
         return;
     }
     CBCharacteristic *characteristic = [self findCharacteristicFromUUID:cu service:service];
     if (!characteristic) {
-        printf("Could not find characteristic with UUID %s on service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:cu],[self CBUUIDToString:su],[self UUIDToString:p.UUID]);
+        printf("Could not find characteristic with UUID %s on service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:cu],[self CBUUIDToString:su],[self UUIDToString:CFBridgingRetain(p.identifier)]);
         return;
     }
     [p readValueForCharacteristic:characteristic];
@@ -128,12 +128,12 @@ static BLEAdapter * _sharedBLEAdapter = nil;
     CBUUID *cu = [CBUUID UUIDWithData:cd];
     CBService *service = [self findServiceFromUUID:su p:p];
     if (!service) {
-        printf("Could not find service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:su],[self UUIDToString:p.UUID]);
+        printf("Could not find service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:su],[self UUIDToString:CFBridgingRetain(p.identifier)]);
         return;
     }
     CBCharacteristic *characteristic = [self findCharacteristicFromUUID:cu service:service];
     if (!characteristic) {
-        printf("Could not find characteristic with UUID %s on service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:cu],[self CBUUIDToString:su],[self UUIDToString:p.UUID]);
+        printf("Could not find characteristic with UUID %s on service with UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:cu],[self CBUUIDToString:su],[self UUIDToString:CFBridgingRetain(p.identifier)]);
         return;
     }
     [p setNotifyValue:on forCharacteristic:characteristic];
@@ -210,7 +210,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
     
     if(status == TRUE)
     {
-        printf("Connecting to peripheral with UUID : %s\r\n",[self UUIDToString:peripheral.UUID]);
+        printf("Connecting to peripheral with UUID : %s\r\n",[self UUIDToString:CFBridgingRetain(peripheral.identifier)]);
         activePeripheral = peripheral;
         activePeripheral.delegate = self;
         [CM connectPeripheral:activePeripheral options:nil];
@@ -299,7 +299,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
     //printf("UUID : %s\r\n",CFStringGetCStringPtr(s, 0));
     printf("RSSI : %d\r\n",[peripheral.RSSI intValue]);
     printf("Name : %s\r\n",[peripheral.name cStringUsingEncoding:NSStringEncodingConversionAllowLossy]);
-    printf("isConnected : %d\r\n",peripheral.isConnected);
+    printf("isConnected : %ld\r\n",(long)[peripheral state]);
     printf("-------------------------------------\r\n");
     
 }
@@ -559,7 +559,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 //----------------------------------------------------------------------------------------------------
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central {
-    printf("Status of CoreBluetooth central manager changed %d (%s)\r\n",central.state,[self centralManagerStateToString:central.state]);
+    printf("Status of CoreBluetooth central manager changed %ld (%s)\r\n",(long)central.state,[self centralManagerStateToString:central.state]);
 }
 
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI {
@@ -568,8 +568,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
         
         for(int i = 0; i < self.peripherals.count; i++) {
             CBPeripheral *p = [self.peripherals objectAtIndex:i];
-         
-            int nResult = [self UUIDSAreEqual:p.UUID u2:peripheral.UUID];
+            int nResult = [self UUIDSAreEqual:CFBridgingRetain(p.identifier) u2:CFBridgingRetain(peripheral.identifier)];
             if (nResult == 1) {
                 [self.peripherals replaceObjectAtIndex:i withObject:peripheral];
                 printf("Duplicate UUID found updating ...\r\n");
@@ -593,7 +592,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
-    printf("Connection to peripheral with UUID : %s successfull\r\n",[self UUIDToString:peripheral.UUID]);
+    printf("Connection to peripheral with UUID : %s successfull\r\n",CFBridgingRetain(peripheral.identifier));
     self.activePeripheral = peripheral;
     
     [[self delegate] OnConnected:YES];
@@ -601,7 +600,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
-    printf("Failed to connect to peripheral %s\r\n",[self UUIDToString:peripheral.UUID]);
+    printf("Failed to connect to peripheral %s\r\n",CFBridgingRetain(peripheral.identifier));
     self.activePeripheral = peripheral;
     
     [[self delegate] OnConnected:NO];
@@ -679,7 +678,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 {
     if (!error)
     {
-        NSLog(@"Services of peripheral with UUID : %s found\r\n",[self UUIDToString:peripheral.UUID]);
+        NSLog(@"Services of peripheral with UUID : %s found\r\n",CFBridgingRetain(peripheral.identifier));
         [[self delegate] OnDiscoverServices:peripheral.services];
     }
     else
@@ -702,10 +701,10 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
     if (!error) {
-        printf("Updated notification state for characteristic with UUID %s on service with  UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:characteristic.UUID],[self CBUUIDToString:characteristic.service.UUID],[self UUIDToString:peripheral.UUID]);
+        printf("Updated notification state for characteristic with UUID %s on service with  UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:characteristic.UUID],[self CBUUIDToString:characteristic.service.UUID],[[[peripheral identifier] UUIDString] UTF8String]);
     }
     else {
-        printf("Error in setting notification state for characteristic with UUID %s on service with  UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:characteristic.UUID],[self CBUUIDToString:characteristic.service.UUID],[self UUIDToString:peripheral.UUID]);
+        printf("Error in setting notification state for characteristic with UUID %s on service with  UUID %s on peripheral with UUID %s\r\n",[self CBUUIDToString:characteristic.UUID],[self CBUUIDToString:characteristic.service.UUID],[[[peripheral identifier] UUIDString] UTF8String]);
         printf("Error code was %s\r\n",[[error description] cStringUsingEncoding:NSStringEncodingConversionAllowLossy]);
     }
     
@@ -726,7 +725,6 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     if (!error) {
-        NSLog(@"hjgjghjkhg");
         [[self delegate] OnReadDataChanged:YES : (CBCharacteristic*) characteristic];
     }
     else {

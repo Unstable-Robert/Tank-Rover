@@ -74,7 +74,7 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     sendNewData = YES;
     CGPoint loc = [leftTouch locationInView:leftJoyStick];
     if (loc.y > 0) {
-        CGFloat value = fabsf(loc.y / leftJoyStick.frame.size.height);
+        CGFloat value = fabs(loc.y / leftJoyStick.frame.size.height);
         leftJoyStick.height = value;
         [leftJoyStick setNeedsDisplay];
         if ([self updateHexValues]) [self sendNewValues];
@@ -85,7 +85,7 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     sendNewData = YES;
     CGPoint loc = [rightTouch locationInView:rightJoyStick];
     if (loc.y > 0) {
-        CGFloat value = fabsf(loc.y / rightJoyStick.frame.size.height);
+        CGFloat value = fabs(loc.y / rightJoyStick.frame.size.height);
         rightJoyStick.height = value;
         [rightJoyStick setNeedsDisplay];
         if ([self updateHexValues]) [self sendNewValues];
@@ -139,16 +139,27 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 
 - (void)stopMotors {
 //    leftMotorDir = 0x00;
-    leftMotorSpeed = 0x96;
-    rightMotorSpeed = 0x96;
+//    leftMotorSpeed = 0x96;
+//    rightMotorSpeed = 0x96;
+    leftMotorSpeed = 0x54;
+    rightMotorSpeed = 0x54;
 //    rightMotorDir = 0x00;
     char bytes[] = {leftMotorSpeed,rightMotorSpeed};
     NSData *data = [NSData dataWithBytes:bytes length:2];
     [self sendDataString:data];
 }
-- (void)readData {
+-(void) OnReadDataChanged:(BOOL)status : (CBCharacteristic *) characteristic {
+    NSData *data = characteristic.value;
+    UInt8 bytes[data.length];
+    [data getBytes:bytes length:data.length];
+    NSString *string = [[NSString alloc] initWithBytes:bytes length:data.length encoding:
+            NSUTF8StringEncoding];
+    string = [string stringByReplacingOccurrencesOfString:@"{" withString:@""];
+    string = [string stringByReplacingOccurrencesOfString:@"}" withString:@""];
+    NSArray *vals = [string componentsSeparatedByString:@","];
+    NSInteger heading = [vals[0] integerValue];
+    NSInteger pingSensor = [vals[1] integerValue];
 }
-
 - (void)sendDataString:(NSData *)tempData {
     [self.bleAdapter.activePeripheral writeValue:tempData
                                forCharacteristic:sendDataCharacteristic
@@ -188,11 +199,28 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 
 - (void)OnDiscoverCharacteristics:(NSArray *)c {
     for (CBCharacteristic *character in c) {
+        CBCharacteristicProperties properties = [character properties];
+        /* // b r w1 w2 n i a e]*/
+        
+        NSString *props= [[NSString alloc] initWithFormat:@"B:%d R:%d w:%d W:%d N:%d I:%d A:%d E:%d",
+                                     properties & CBCharacteristicPropertyBroadcast?1:0,
+                                     properties & CBCharacteristicPropertyRead?1:0,
+                                     properties & CBCharacteristicPropertyWriteWithoutResponse?1:0,
+                                     properties & CBCharacteristicPropertyWrite?1:0,
+                                     properties & CBCharacteristicPropertyNotify?1:0,
+                                     properties & CBCharacteristicPropertyIndicate?1:0,
+                                     properties & CBCharacteristicPropertyAuthenticatedSignedWrites?1:0,
+                                     properties & CBCharacteristicPropertyExtendedProperties?1:0
+                                     ];
+        NSLog(@"%@", props);
         if ([character.UUID isEqual:[CBUUID UUIDWithString:TXUUID]]) {
+            NSLog(@"Send");
             sendDataCharacteristic = character;
         }
         if ([character.UUID isEqual:[CBUUID UUIDWithString:RXUUID]]) {
+            NSLog(@"Read");
             readDataCharacteristic = character;
+            [bleAdapter.activePeripheral setNotifyValue:true forCharacteristic:readDataCharacteristic];
         }
     }
 }

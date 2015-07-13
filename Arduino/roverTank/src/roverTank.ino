@@ -50,8 +50,8 @@ void setup(void) {
     Serial.println();
     startingUpCommand("Up");
     startingUpCommand("Swagger");
-    mag.begin();
-    accel.begin();
+    // mag.begin();
+    // accel.begin();
     startingUpCommand("Dooms Day Weapon");
     BTLEserial.begin();
     pinMode(BLUELED, OUTPUT);
@@ -76,26 +76,27 @@ void startingUpCommand(String process) {
 
 void loop() {
   /*runningLoop();*/
-  testTurning();
-  /*testingCompass();*/
-  /*rectangle();
-  delay(2000);*/
+  // testTurning();
+  // testingCompass();
+  // testingCompass2();
+  // rectangle();
+  // delay(2000);
 }
 void rectangle() {
     /*setMotorSpeed(1700, 1700);
     delay(1000);
     setMotorSpeed(1500, 1500);*/
-    turnTo(136, RIGHT);
+    turnTo(136);
     delay(1000);
-    turnTo(237, RIGHT);
+    turnTo(237);
     delay(1000);
-    turnTo(306, RIGHT);
+    turnTo(306);
     delay(1000);
-    turnTo(10, RIGHT);
+    turnTo(10);
     delay(1000);
 }
 void testTurning() {
-    turnTo(getLeftHeading(getCurrentHeading()), LEFT);
+    turnTo(getLeftHeading(getCurrentHeading()));
     Serial.println();
     Serial.println();
     Serial.println();
@@ -104,6 +105,10 @@ void testTurning() {
     delay(2000);
     digitalWrite(BLUELED, LOW);
     Serial.print("turning again.....Heading:");Serial.println(getCurrentHeading());
+}
+void testingCompass2(){
+    int currentHeading = getAvgHeading();
+    Serial.print("CurrentHeading: "); Serial.println(currentHeading);
 }
 void testingCompass() {
     sensors_event_t event;
@@ -176,7 +181,7 @@ void aiLED() {
         digitalWrite(BLUELED, LOW);
     }
 }
-void sendBTInfo(long dist, int heading) {
+void sendBTInfo(int dist, int heading) {
     String send ="{" + String(heading) + ","+ String(dist) + "} ";
     /*Serial.println(send);
     Serial.println(send.length());*/
@@ -192,9 +197,9 @@ void findNextDirection() {
     Serial.print("Left: ");Serial.println(left);
     if ((left > 30) || (right > 30)) {
         if (left > right) {
-            turnTo(getLeftHeading(getCurrentHeading()), LEFT);
+            turnTo(getLeftHeading(getCurrentHeading()));
         } else if (right > left) {
-            turnTo(getRightHeading(getCurrentHeading()), RIGHT);
+            turnTo(getRightHeading(getCurrentHeading()));
         } else {
             reverseFor(300);
             findNextDirection();
@@ -205,7 +210,8 @@ void findNextDirection() {
     }
     if (!AIMode) runningLoop();
 }
-void turnTo(int heading, int dir) {
+void turnTo(int heading) {
+    int dir = checkTurnDirection(getAvgHeading(), heading);
     boolean turning = true;
     int delayTime = 200;
     while (turning) {
@@ -219,20 +225,11 @@ void turnTo(int heading, int dir) {
             delay(delayTime);
             setMotorSpeed(1500, 1500);
         }
-        // printAccelInfo();
         delay(1000);
-        // printAccelInfo();
-        //get heading for if statements
         int currentHeading = getAvgHeading();
         Serial.print("CurrentHeading: "); Serial.println(currentHeading);
         Serial.print("Heading: "); Serial.println(heading);
-        //
-        if ((dir == LEFT) && (currentHeading < heading) && (delayTime == 100)) {
-            dir = RIGHT;
-        }
-        if ((dir == RIGHT) && (currentHeading > heading) && (delayTime == 100)) {
-            dir = LEFT;
-        }
+        dir = checkTurnDirection(currentHeading, heading);
         if (((heading - 10) <= currentHeading) && ((heading + 10) >= currentHeading)) {
             delayTime = 100;
         }
@@ -243,39 +240,55 @@ void turnTo(int heading, int dir) {
         if (!AIMode) runningLoop();
     }
 }
-long getRightDistance() {
+//ch = CurrentHeading
+//t2 = TurnTo
+int checkTurnDirection(int ch, int t2){
+    if ((t2 > ch) && ((t2 - ch) <= 180)) {
+        return RIGHT;
+    } else if ((t2 > ch) && ((t2 - ch) > 180)) {
+        return LEFT;
+    } else if ((ch > t2) && ((ch - t2) <= 180)) {
+        return LEFT;
+    } else if ((ch > t2) && ((ch - t2) > 180)) {
+        return RIGHT;
+    } else {
+        Serial.println("BROKEN");
+        return 0;
+    }
+}
+int getRightDistance() {
     ps.write(RIGHT);
     delay(300);
-    long distanceR = getPingSensorDistance();
+    int distanceR = getPingSensorDistance();
     delay(150);
     ps.write(CENTER);
     if (!AIMode) runningLoop();
     return distanceR;
 }
 
-long getLeftDistance() {
+int getLeftDistance() {
     ps.write(LEFT);
     delay(300);
-    long distanceL = getPingSensorDistance();
+    int distanceL = getPingSensorDistance();
     delay(150);
     ps.write(CENTER);
     if (!AIMode) runningLoop();
     return distanceL;
 }
 
-long getPingSensorDistance() {
-    long val1 = getPingSensorValue();
+int getPingSensorDistance() {
+    int val1 = getPingSensorValue();
     delay(300);
-    long val2 = getPingSensorValue();
+    int val2 = getPingSensorValue();
     delay(300);
-    long val3 = getPingSensorValue();
+    int val3 = getPingSensorValue();
     delay(300);
-    long val4 = getPingSensorValue();
+    int val4 = getPingSensorValue();
     delay(300);
-    long com = val1 + val2 + val3 + val4;
+    int com = val1 + val2 + val3 + val4;
     return com/4;
 }
-long getPingSensorValue() {
+int getPingSensorValue() {
     pinMode(PINGSENSOR, OUTPUT);
     digitalWrite(PINGSENSOR, LOW);
     delayMicroseconds(2);
@@ -283,7 +296,8 @@ long getPingSensorValue() {
     delayMicroseconds(5);
     pinMode(PINGSENSOR, INPUT);
     long duration = pulseIn(PINGSENSOR,HIGH);
-    return duration / 29 / 2;
+    int dur = (int)duration / 29 / 2;
+    return dur;
 }
 /*int getCurrentHeading() {
     sensors_event_t event;
@@ -311,6 +325,7 @@ int getCurrentHeading() {
 }
 int getAvgHeading() {
     int myHeadings[5];
+    int avg;
     for (int x = 0; x < 5; x++) {
         myHeadings[x] = getCurrentHeading();
         delay(200);
@@ -320,7 +335,10 @@ int getAvgHeading() {
         Serial.print(myHeadings[x]);Serial.print(", ");
     }
     Serial.print(myHeadings[4]);Serial.println("}");
-    return myHeadings[4];
+    for (int x = 0; x < 5; x++) {
+        avg = avg + myHeadings[x];
+    }
+    return avg / 5;
 }
 void printAccelInfo() {
     sensors_event_t accel_event;
