@@ -38,7 +38,7 @@ unsigned long interval = 3000;
 unsigned long currentMillis = millis();
 unsigned long previousMillis;
 long lastDebounceTime = 0;
-long debounceDelay = 100;
+long debounceDelay = 300;
 boolean AIMode = true;
 
 Adafruit_BLE_UART BTLEserial = Adafruit_BLE_UART(ADAFRUITBLE_REQ, ADAFRUITBLE_RDY, ADAFRUITBLE_RST);
@@ -75,8 +75,8 @@ void startingUpCommand(String process) {
 }
 
 void loop() {
-  runningLoop();
-  /*testTurning();*/
+  /*runningLoop();*/
+  testTurning();
   /*testingCompass();*/
   /*rectangle();
   delay(2000);*/
@@ -96,9 +96,14 @@ void rectangle() {
 }
 void testTurning() {
     turnTo(getLeftHeading(getCurrentHeading()), LEFT);
-    delay(1000);
-    Serial.println("turning again");
-    Serial.println(getCurrentHeading());
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    digitalWrite(BLUELED, HIGH);
+    delay(2000);
+    digitalWrite(BLUELED, LOW);
+    Serial.print("turning again.....Heading:");Serial.println(getCurrentHeading());
 }
 void testingCompass() {
     sensors_event_t event;
@@ -214,21 +219,25 @@ void turnTo(int heading, int dir) {
             delay(delayTime);
             setMotorSpeed(1500, 1500);
         }
-        delay(800);
-        if ((dir == LEFT) && (getCurrentHeading() < heading) && (delayTime == 100)) {
+        // printAccelInfo();
+        delay(1000);
+        // printAccelInfo();
+        //get heading for if statements
+        int currentHeading = getAvgHeading();
+        Serial.print("CurrentHeading: "); Serial.println(currentHeading);
+        Serial.print("Heading: "); Serial.println(heading);
+        //
+        if ((dir == LEFT) && (currentHeading < heading) && (delayTime == 100)) {
             dir = RIGHT;
-            delayTime = 50;
         }
-        if ((dir == RIGHT) && (getCurrentHeading() > heading) && (delayTime == 100)) {
+        if ((dir == RIGHT) && (currentHeading > heading) && (delayTime == 100)) {
             dir = LEFT;
-            delayTime = 50;
         }
-        if (((heading - 10) <= getCurrentHeading()) && ((heading + 10) >= getCurrentHeading())) {
+        if (((heading - 10) <= currentHeading) && ((heading + 10) >= currentHeading)) {
             delayTime = 100;
         }
-        Serial.print("CurrentHeading: "); Serial.println(getCurrentHeading());
-        Serial.print("Heading: "); Serial.println(heading);
-        if (((heading - 1) <= getCurrentHeading()) && ((heading + 1) >= getCurrentHeading())) {
+        if (((heading - 1) <= currentHeading) && ((heading + 1) >= currentHeading)) {
+            Serial.print("Turn Complete....Heading: ");Serial.println(currentHeading);
             turning = false;
         }
         if (!AIMode) runningLoop();
@@ -299,6 +308,26 @@ int getCurrentHeading() {
     } else {
         return -1;
     }
+}
+int getAvgHeading() {
+    int myHeadings[5];
+    for (int x = 0; x < 5; x++) {
+        myHeadings[x] = getCurrentHeading();
+        delay(200);
+    }
+    Serial.print("Headings: {");
+    for (int x = 0; x < 4; x++) {
+        Serial.print(myHeadings[x]);Serial.print(", ");
+    }
+    Serial.print(myHeadings[4]);Serial.println("}");
+    return myHeadings[4];
+}
+void printAccelInfo() {
+    sensors_event_t accel_event;
+    accel.getEvent(&accel_event);
+    Serial.print("X: "); Serial.print(accel_event.acceleration.x); Serial.print("  ");
+    Serial.print("Y: "); Serial.print(accel_event.acceleration.y); Serial.print("  ");
+    Serial.print("Z: "); Serial.print(accel_event.acceleration.z); Serial.println("  ");
 }
 int getLeftHeading(int heading) {  //subtract 90
     int newHeading = heading - 90;
