@@ -1,5 +1,5 @@
 //
-//  ThrottleImages.h
+//  StyleKit.h
 //  BluetoothTank
 //
 //  Created by Robert Mannuzza on 7/13/15.
@@ -13,7 +13,7 @@
 
 
 
-@interface ThrottleImages : NSObject
+@interface StyleKit : NSObject
 
 // Colors
 + (UIColor*)pathWay;
@@ -26,6 +26,8 @@
 
 // Drawing Methods
 + (void)drawJoyStickWithWindowWidth: (CGFloat)windowWidth windowHeight: (CGFloat)windowHeight throttleSpeed: (CGFloat)throttleSpeed;
++ (void)drawCompassWithAngle: (CGFloat)angle;
++ (void)drawDistanceMeter;
 
 @end
 

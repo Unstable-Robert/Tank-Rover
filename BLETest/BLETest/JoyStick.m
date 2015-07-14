@@ -7,7 +7,7 @@
 //
 
 #import "JoyStick.h"
-#import "ThrottleImages.h"
+#import "StyleKit.h"
 
 @implementation JoyStick
 
@@ -16,12 +16,12 @@
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect {
     // Drawing code
-    [ThrottleImages drawJoyStickWithWindowWidth:self.frame.size.width windowHeight:self.frame.size.height throttleSpeed:self.height];
+    [StyleKit drawJoyStickWithWindowWidth:self.frame.size.width windowHeight:self.frame.size.height throttleSpeed:self.height];
 }
 
 - (void)drawRect:(CGRect)rect withHeight:(CGFloat)height {
     // Drawing code
-    [ThrottleImages drawJoyStickWithWindowWidth:self.frame.size.width windowHeight:self.frame.size.height throttleSpeed:self.height];
+    [StyleKit drawJoyStickWithWindowWidth:self.frame.size.width windowHeight:self.frame.size.height throttleSpeed:self.height];
 }
 
 -(UInt8)getDirection {

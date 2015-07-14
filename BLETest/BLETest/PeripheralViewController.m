@@ -20,6 +20,8 @@
     UInt8 rightMotorSpeed;
     
     BOOL sendNewData;
+    
+    CGFloat moveToHeading;
 }
 
 @end
@@ -28,7 +30,7 @@ static NSString *RXUUID = @"6e400003-b5a3-f393-e0a9-e50e24dcca9e";
 static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 
 @implementation PeripheralViewController
-@synthesize toConnect, bleAdapter,leftJoyStick,rightJoyStick,leftTouch,rightTouch;
+@synthesize toConnect, bleAdapter,leftJoyStick,rightJoyStick,leftTouch,rightTouch,compassView;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -38,10 +40,17 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     [self.bleAdapter setDelegate:self];
     leftJoyStick.height = 0.5;
     rightJoyStick.height = 0.5;
+    compassView.angle = 0;
+    moveToHeading = 0;
     
     [NSTimer scheduledTimerWithTimeInterval:1.0
                                      target:self
                                    selector:@selector(myThreadMethod)
+                                   userInfo:nil
+                                    repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.001
+                                     target:self
+                                   selector:@selector(updateCompassHeading)
                                    userInfo:nil
                                     repeats:YES];
 }
@@ -67,7 +76,27 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
         [self stopMotors];
     }
 }
-
+- (void)updateCompassHeading {
+    if ((moveToHeading > compassView.angle) && ((moveToHeading - compassView.angle) <= 180)) {
+        compassView.angle = compassView.angle + 1;
+        [compassView setNeedsDisplay];
+    } else if ((moveToHeading > compassView.angle) && ((moveToHeading - compassView.angle) > 180)) {
+        compassView.angle = compassView.angle - 1;
+        [compassView setNeedsDisplay];
+    } else if ((compassView.angle > moveToHeading) && ((compassView.angle - moveToHeading) <= 180)) {
+        compassView.angle = compassView.angle - 1;
+        [compassView setNeedsDisplay];
+    } else if ((compassView.angle > moveToHeading) && ((compassView.angle - moveToHeading) > 180)) {
+        compassView.angle = compassView.angle + 1;
+        [compassView setNeedsDisplay];
+    }
+    if (compassView.angle < 0) {
+        compassView.angle = compassView.angle + 360;
+    }
+    if (compassView.angle > 359) {
+        compassView.angle = compassView.angle - 180;
+    }
+}
 #pragma mark - Handling Touches
 
 - (IBAction)leftTouchBegin:(id)sender {
@@ -138,12 +167,8 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 }
 
 - (void)stopMotors {
-//    leftMotorDir = 0x00;
-//    leftMotorSpeed = 0x96;
-//    rightMotorSpeed = 0x96;
-    leftMotorSpeed = 0x54;
-    rightMotorSpeed = 0x54;
-//    rightMotorDir = 0x00;
+    leftMotorSpeed = 0x96;
+    rightMotorSpeed = 0x96;
     char bytes[] = {leftMotorSpeed,rightMotorSpeed};
     NSData *data = [NSData dataWithBytes:bytes length:2];
     [self sendDataString:data];
@@ -157,8 +182,9 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     string = [string stringByReplacingOccurrencesOfString:@"{" withString:@""];
     string = [string stringByReplacingOccurrencesOfString:@"}" withString:@""];
     NSArray *vals = [string componentsSeparatedByString:@","];
-    NSInteger heading = [vals[0] integerValue];
-    NSInteger pingSensor = [vals[1] integerValue];
+    CGFloat heading = [vals[0] integerValue];
+    CGFloat pingSensor = [vals[1] integerValue];
+    moveToHeading = heading;
 }
 - (void)sendDataString:(NSData *)tempData {
     [self.bleAdapter.activePeripheral writeValue:tempData

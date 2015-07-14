@@ -15,10 +15,11 @@
 		E112C2B21A607E46003B78CE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E112C2B11A607E46003B78CE /* Images.xcassets */; };
 		E112C2B51A607E46003B78CE /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E112C2B31A607E46003B78CE /* LaunchScreen.xib */; };
 		E112C2C11A607E47003B78CE /* BLETestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E112C2C01A607E47003B78CE /* BLETestTests.m */; };
+		E12BABC31B54A767000CC31B /* StyleKit.m in Sources */ = {isa = PBXBuildFile; fileRef = E12BABC21B54A767000CC31B /* StyleKit.m */; };
+		E12BABC61B54A799000CC31B /* CompassView.m in Sources */ = {isa = PBXBuildFile; fileRef = E12BABC51B54A799000CC31B /* CompassView.m */; };
 		E177CE201A73035D009C108C /* BLEAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = E177CE1F1A73035D009C108C /* BLEAdapter.m */; };
 		E177CE231A733248009C108C /* PeripheralViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E177CE221A733248009C108C /* PeripheralViewController.m */; };
 		E177CE291A736F04009C108C /* JoyStick.m in Sources */ = {isa = PBXBuildFile; fileRef = E177CE281A736F04009C108C /* JoyStick.m */; };
-		E177CE2C1A737097009C108C /* ThrottleImages.m in Sources */ = {isa = PBXBuildFile; fileRef = E177CE2B1A737097009C108C /* ThrottleImages.m */; };
 		E17F7A4E1A968CAB004CD86D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E17F7A4D1A968CAB004CD86D /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
@@ -47,14 +48,16 @@
 		E112C2BA1A607E47003B78CE /* BLETestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BLETestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E112C2BF1A607E47003B78CE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E112C2C01A607E47003B78CE /* BLETestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLETestTests.m; sourceTree = "<group>"; };
+		E12BABC11B54A767000CC31B /* StyleKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StyleKit.h; sourceTree = "<group>"; };
+		E12BABC21B54A767000CC31B /* StyleKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StyleKit.m; sourceTree = "<group>"; };
+		E12BABC41B54A799000CC31B /* CompassView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompassView.h; sourceTree = "<group>"; };
+		E12BABC51B54A799000CC31B /* CompassView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CompassView.m; sourceTree = "<group>"; };
 		E177CE1E1A73035D009C108C /* BLEAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLEAdapter.h; sourceTree = "<group>"; };
 		E177CE1F1A73035D009C108C /* BLEAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLEAdapter.m; sourceTree = "<group>"; };
 		E177CE211A733248009C108C /* PeripheralViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PeripheralViewController.h; sourceTree = "<group>"; };
 		E177CE221A733248009C108C /* PeripheralViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PeripheralViewController.m; sourceTree = "<group>"; };
 		E177CE271A736F04009C108C /* JoyStick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoyStick.h; sourceTree = "<group>"; };
 		E177CE281A736F04009C108C /* JoyStick.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JoyStick.m; sourceTree = "<group>"; };
-		E177CE2A1A737097009C108C /* ThrottleImages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThrottleImages.h; sourceTree = "<group>"; };
-		E177CE2B1A737097009C108C /* ThrottleImages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThrottleImages.m; sourceTree = "<group>"; };
 		E17F7A4D1A968CAB004CD86D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -102,6 +105,8 @@
 				E177CE2D1A7370A6009C108C /* SkyleKit */,
 				E177CE271A736F04009C108C /* JoyStick.h */,
 				E177CE281A736F04009C108C /* JoyStick.m */,
+				E12BABC41B54A799000CC31B /* CompassView.h */,
+				E12BABC51B54A799000CC31B /* CompassView.m */,
 				E177CE1E1A73035D009C108C /* BLEAdapter.h */,
 				E177CE1F1A73035D009C108C /* BLEAdapter.m */,
 				E112C2A51A607E46003B78CE /* AppDelegate.h */,
@@ -148,8 +153,8 @@
 		E177CE2D1A7370A6009C108C /* SkyleKit */ = {
 			isa = PBXGroup;
 			children = (
-				E177CE2A1A737097009C108C /* ThrottleImages.h */,
-				E177CE2B1A737097009C108C /* ThrottleImages.m */,
+				E12BABC11B54A767000CC31B /* StyleKit.h */,
+				E12BABC21B54A767000CC31B /* StyleKit.m */,
 			);
 			name = SkyleKit;
 			sourceTree = "<group>";
@@ -259,9 +264,10 @@
 				E177CE231A733248009C108C /* PeripheralViewController.m in Sources */,
 				E112C2AD1A607E46003B78CE /* ViewController.m in Sources */,
 				E177CE291A736F04009C108C /* JoyStick.m in Sources */,
+				E12BABC61B54A799000CC31B /* CompassView.m in Sources */,
 				E112C2A41A607E46003B78CE /* main.m in Sources */,
 				E177CE201A73035D009C108C /* BLEAdapter.m in Sources */,
-				E177CE2C1A737097009C108C /* ThrottleImages.m in Sources */,
+				E12BABC31B54A767000CC31B /* StyleKit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

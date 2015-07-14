@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "BLEAdapter.h"
 #import "JoyStick.h"
+#import "CompassView.h"
 
 @interface PeripheralViewController : UIViewController <UIGestureRecognizerDelegate>
 
@@ -18,6 +19,7 @@
 @property (strong, nonatomic) CBPeripheral *toConnect;
 @property (strong, nonatomic) IBOutlet JoyStick *leftJoyStick;
 @property (strong, nonatomic) IBOutlet JoyStick *rightJoyStick;
+@property (strong, nonatomic) IBOutlet CompassView *compassView;
 @property (strong, nonatomic) IBOutlet UIPanGestureRecognizer *rightTouch;
 @property (strong, nonatomic) IBOutlet UIPanGestureRecognizer *leftTouch;
 
