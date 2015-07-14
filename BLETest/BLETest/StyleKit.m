@@ -159,7 +159,7 @@ static NSShadow* _shadow = nil;
     UIColor* topRight = [UIColor colorWithRed: 0.429 green: 0.429 blue: 0.429 alpha: 1];
     UIColor* botRight = [UIColor colorWithRed: 0.738 green: 0.738 blue: 0.738 alpha: 1];
     UIColor* topLeft = [UIColor colorWithRed: 0.737 green: 0.737 blue: 0.737 alpha: 1];
-    UIColor* compassTextColor = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 1];
+    UIColor* compassTextColor = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 1];
 
     //// Shadow Declarations
     NSShadow* textOuterShowow = [NSShadow shadowWithColor: UIColor.whiteColor offset: CGSizeMake(0.1, -0.1) blurRadius: 1];
@@ -801,7 +801,7 @@ static NSShadow* _shadow = nil;
         //// Text Drawing
         CGRect textRect = CGRectMake(-2, -88, 6, 8);
         {
-            NSString* textContent = @"0°";
+            NSString* textContent = @"0";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* textStyle = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -826,7 +826,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text1Rect = CGRectMake(-4, -4, 8, 8);
         {
-            NSString* textContent = @"15°";
+            NSString* textContent = @"15";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text1Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -853,7 +853,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text2Rect = CGRectMake(0, 0, 8, 8);
         {
-            NSString* textContent = @"30°";
+            NSString* textContent = @"30";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text2Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -880,7 +880,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text3Rect = CGRectMake(0, 0, 8, 8);
         {
-            NSString* textContent = @"45°";
+            NSString* textContent = @"45";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text3Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -907,7 +907,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text4Rect = CGRectMake(0, 0, 8, 8);
         {
-            NSString* textContent = @"60°";
+            NSString* textContent = @"60";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text4Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -934,7 +934,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text5Rect = CGRectMake(0, 0, 8, 8);
         {
-            NSString* textContent = @"75°";
+            NSString* textContent = @"75";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text5Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -961,7 +961,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text6Rect = CGRectMake(0, 0, 8, 7);
         {
-            NSString* textContent = @"90°";
+            NSString* textContent = @"90";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text6Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -988,7 +988,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text7Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"105°";
+            NSString* textContent = @"105";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text7Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1015,7 +1015,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text8Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"120°";
+            NSString* textContent = @"120";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text8Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1042,7 +1042,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text9Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"135°";
+            NSString* textContent = @"135";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text9Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1069,7 +1069,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text10Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"150°";
+            NSString* textContent = @"150";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text10Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1096,7 +1096,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text11Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"165°";
+            NSString* textContent = @"165";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text11Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1123,7 +1123,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text12Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"180°";
+            NSString* textContent = @"180";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text12Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1150,7 +1150,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text13Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"195°";
+            NSString* textContent = @"195";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text13Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1177,7 +1177,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text14Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"210°";
+            NSString* textContent = @"210";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text14Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1204,7 +1204,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text15Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"225°";
+            NSString* textContent = @"225";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text15Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1231,7 +1231,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text16Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"240°";
+            NSString* textContent = @"240";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text16Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1258,7 +1258,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text17Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"255°";
+            NSString* textContent = @"255";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text17Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1285,7 +1285,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text18Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"270°";
+            NSString* textContent = @"270";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text18Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1312,7 +1312,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text19Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"285°";
+            NSString* textContent = @"285";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text19Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1339,7 +1339,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text20Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"300°";
+            NSString* textContent = @"300";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text20Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1366,7 +1366,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text21Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"315°";
+            NSString* textContent = @"315";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text21Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1393,7 +1393,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text22Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"330°";
+            NSString* textContent = @"330";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text22Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
@@ -1420,7 +1420,7 @@ static NSShadow* _shadow = nil;
 
         CGRect text23Rect = CGRectMake(-6, -4, 12, 8);
         {
-            NSString* textContent = @"345°";
+            NSString* textContent = @"345";
             CGContextSaveGState(context);
             CGContextSetShadowWithColor(context, textOuterShowow.shadowOffset, textOuterShowow.shadowBlurRadius, [textOuterShowow.shadowColor CGColor]);
             NSMutableParagraphStyle* text23Style = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
