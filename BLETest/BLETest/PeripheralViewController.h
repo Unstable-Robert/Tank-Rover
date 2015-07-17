@@ -22,6 +22,7 @@
 @property (strong, nonatomic) IBOutlet CompassView *compassView;
 @property (strong, nonatomic) IBOutlet UIPanGestureRecognizer *rightTouch;
 @property (strong, nonatomic) IBOutlet UIPanGestureRecognizer *leftTouch;
+@property (strong, nonatomic) IBOutlet UILabel *btValues;
 
 - (void)sendDataString:(NSData *)data;
 - (IBAction)leftTouchBegin:(id)sender;

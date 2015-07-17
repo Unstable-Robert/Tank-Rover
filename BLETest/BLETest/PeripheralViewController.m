@@ -30,7 +30,7 @@ static NSString *RXUUID = @"6e400003-b5a3-f393-e0a9-e50e24dcca9e";
 static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 
 @implementation PeripheralViewController
-@synthesize toConnect, bleAdapter,leftJoyStick,rightJoyStick,leftTouch,rightTouch,compassView;
+@synthesize toConnect, bleAdapter,leftJoyStick,rightJoyStick,leftTouch,rightTouch,compassView,btValues;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -42,6 +42,7 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     rightJoyStick.height = 0.5;
     compassView.angle = 0;
     moveToHeading = 0;
+    [btValues setText:@"HI"];
     
     [NSTimer scheduledTimerWithTimeInterval:1.0
                                      target:self
@@ -184,6 +185,7 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     NSArray *vals = [string componentsSeparatedByString:@","];
     CGFloat heading = [vals[0] integerValue];
     CGFloat pingSensor = [vals[1] integerValue];
+    [btValues setText:[NSString stringWithFormat:@"H: %f", heading]];
     moveToHeading = heading;
 }
 - (void)sendDataString:(NSData *)tempData {

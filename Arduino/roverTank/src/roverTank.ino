@@ -22,6 +22,12 @@
 #define CENTER 85
 #define LEFT 1
 #define RIGHT 167
+#define BROKEN 100
+
+#define FRONT 165
+#define RIGHTY 240
+#define BACK 292
+#define LEFTY 350
 
 Adafruit_10DOF                dof   = Adafruit_10DOF();
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
@@ -35,11 +41,13 @@ aci_evt_opcode_t status;
 aci_evt_opcode_t laststatus = ACI_EVT_DISCONNECTED;
 int myBytes[2];
 unsigned long interval = 3000;
+unsigned long updateInterval = 1500;
+unsigned long prevMillis;
 unsigned long currentMillis = millis();
 unsigned long previousMillis;
 long lastDebounceTime = 0;
 long debounceDelay = 300;
-boolean AIMode = true;
+boolean AIMode = false;
 
 Adafruit_BLE_UART BTLEserial = Adafruit_BLE_UART(ADAFRUITBLE_REQ, ADAFRUITBLE_RDY, ADAFRUITBLE_RST);
 
@@ -50,8 +58,8 @@ void setup(void) {
     Serial.println();
     startingUpCommand("Up");
     startingUpCommand("Swagger");
-    // mag.begin();
-    // accel.begin();
+    mag.begin();
+    accel.begin();
     startingUpCommand("Dooms Day Weapon");
     BTLEserial.begin();
     pinMode(BLUELED, OUTPUT);
@@ -75,25 +83,94 @@ void startingUpCommand(String process) {
 }
 
 void loop() {
-  /*runningLoop();*/
+    // bostain();
+  // runningLoop();
   // testTurning();
   // testingCompass();
   // testingCompass2();
-  // rectangle();
+  rectangle();
   // delay(2000);
 }
+void bostain() {
+    int heading = getCurrentHeading();
+    if (!(((315 - 4) <= heading) && ((315 + 4) >= heading))) {
+        turnTo(315);
+        digitalWrite(BLUELED, HIGH);
+        delay(3000);
+        digitalWrite(BLUELED, LOW);
+    }
+    if (!(((193 - 4) <= heading) && ((193 + 4) >= heading))) {
+        turnTo(93);
+        digitalWrite(BLUELED, HIGH);
+        delay(3000);
+        digitalWrite(BLUELED, LOW);
+    }
+    // if (!(((FRONT - 4) <= heading) && ((FRONT + 4) >= heading))) {
+    //     turnTo(FRONT);
+    //     digitalWrite(BLUELED, HIGH);
+    //     delay(3000);
+    //     digitalWrite(BLUELED, LOW);
+    // }
+    // if (!(((205 - 4) <= heading) && ((205 + 4) >= heading))) {
+    //     turnTo(205);
+    //     digitalWrite(BLUELED, HIGH);
+    //     delay(3000);
+    //     digitalWrite(BLUELED, LOW);
+    // }
+    // if (!(((RIGHTY - 4) <= heading) && ((RIGHTY + 4) >= heading))) {
+    //     turnTo(RIGHTY);
+    //     digitalWrite(BLUELED, HIGH);
+    //     delay(3000);
+    //     digitalWrite(BLUELED, LOW);
+    // }
+    // if (!(((267 - 4) <= heading) && ((267 + 4) >= heading))) {
+    //     turnTo(267);
+    //     digitalWrite(BLUELED, HIGH);
+    //     delay(3000);
+    //     digitalWrite(BLUELED, LOW);
+    // }
+    // if (!(((BACK - 4) <= heading) && ((BACK + 4) >= heading))) {
+    //     turnTo(BACK);
+    //     digitalWrite(BLUELED, HIGH);
+    //     delay(3000);
+    //     digitalWrite(BLUELED, LOW);
+    // }
+    // if (!(((325 - 4) <= heading) && ((325 + 4) >= heading))) {
+    //     turnTo(325);
+    //     digitalWrite(BLUELED, HIGH);
+    //     delay(3000);
+    //     digitalWrite(BLUELED, LOW);
+    // }
+    // if (!(((LEFTY - 4) <= heading) && ((LEFTY + 4) >= heading))) {
+    //     turnTo(LEFTY);
+    //     digitalWrite(BLUELED, HIGH);
+    //     delay(3000);
+    //     digitalWrite(BLUELED, LOW);
+    // }
+    // if (!(((66 - 4) <= heading) && ((66 + 4) >= heading))) {
+    //     turnTo(66);
+    //     digitalWrite(BLUELED, HIGH);
+    //     delay(3000);
+    //     digitalWrite(BLUELED, LOW);
+    // }
+}
 void rectangle() {
-    /*setMotorSpeed(1700, 1700);
+    turnTo(343);
+    setMotorSpeed(1700, 1700);
     delay(1000);
-    setMotorSpeed(1500, 1500);*/
+    setMotorSpeed(1500, 1500);
     turnTo(136);
+    setMotorSpeed(1700, 1700);
     delay(1000);
-    turnTo(237);
+    setMotorSpeed(1500, 1500);
+    turnTo(230);
+    setMotorSpeed(1700, 1700);
     delay(1000);
-    turnTo(306);
+    setMotorSpeed(1500, 1500);
+    turnTo(285);
+    setMotorSpeed(1700, 1700);
     delay(1000);
-    turnTo(10);
-    delay(1000);
+    setMotorSpeed(1500, 1500);
 }
 void testTurning() {
     turnTo(getLeftHeading(getCurrentHeading()));
@@ -107,8 +184,13 @@ void testTurning() {
     Serial.print("turning again.....Heading:");Serial.println(getCurrentHeading());
 }
 void testingCompass2(){
-    int currentHeading = getAvgHeading();
+    int currentHeading = getCurrentHeading();
     Serial.print("CurrentHeading: "); Serial.println(currentHeading);
+    delay(500);
+    checkBTStatus();
+    if (status == ACI_EVT_CONNECTED) {
+        sendBTInfo(getPingSensorValue(), getCurrentHeading());
+    }
 }
 void testingCompass() {
     sensors_event_t event;
@@ -134,14 +216,12 @@ void runningLoop() {
     aiLED();
     currentMillis = millis();
     long distance = getPingSensorValue();
-    Serial.print("Distance: "); Serial.println(distance);
     if (distance < 30) {
         digitalWrite(BLUELED, HIGH);
         while(getPingSensorValue() < 40) {
             Serial.println("<30 Backing up");
             setMotorSpeed(1300, 1300);
             delay(30);
-            /*setMotorSpeed(1500, 1500);*/
         }
         setMotorSpeed(1500, 1500);
         if (AIMode) findNextDirection();
@@ -150,7 +230,7 @@ void runningLoop() {
     }
     checkBTStatus();
     if (status == ACI_EVT_CONNECTED) {
-        /*sendBTInfo(distance, getCurrentHeading());*/
+        sendBTInfo(distance, getCurrentHeading());
         if (!AIMode) {
         handlingBT();
         } else {
@@ -182,12 +262,14 @@ void aiLED() {
     }
 }
 void sendBTInfo(int dist, int heading) {
-    String send ="{" + String(heading) + ","+ String(dist) + "} ";
-    /*Serial.println(send);
-    Serial.println(send.length());*/
-    uint8_t buf[send.length()];
-    send.getBytes(buf, send.length());
-    BTLEserial.write(buf, send.length());
+    if((currentMillis - prevMillis) > updateInterval) {
+        prevMillis = currentMillis;
+        Serial.println("here");
+        String send ="{" + String(heading) + ","+ String(dist) + "} ";
+        uint8_t buf[send.length()];
+        send.getBytes(buf, send.length());
+        BTLEserial.write(buf, send.length());
+    }
 }
 void findNextDirection() {
     long right = getRightDistance();
@@ -208,15 +290,15 @@ void findNextDirection() {
         reverseFor(300);
         findNextDirection();
     }
-    if (!AIMode) runningLoop();
+    if (!AIMode) loop();
 }
 void turnTo(int heading) {
     int dir = checkTurnDirection(getAvgHeading(), heading);
     boolean turning = true;
-    int delayTime = 200;
+    int delayTime = 600;
     while (turning) {
         if (dir == LEFT) {
-            setMotorSpeed(1100, 1800);
+            setMotorSpeed(1200, 1800);
             delay(delayTime);
             setMotorSpeed(1500, 1500);
         }
@@ -224,6 +306,9 @@ void turnTo(int heading) {
             setMotorSpeed(1800, 1200);
             delay(delayTime);
             setMotorSpeed(1500, 1500);
+        }
+        if (dir == BROKEN) {
+            turning = false;
         }
         delay(1000);
         int currentHeading = getAvgHeading();
@@ -233,11 +318,18 @@ void turnTo(int heading) {
         if (((heading - 10) <= currentHeading) && ((heading + 10) >= currentHeading)) {
             delayTime = 100;
         }
-        if (((heading - 1) <= currentHeading) && ((heading + 1) >= currentHeading)) {
+        if (((heading - 2) <= currentHeading) && ((heading + 2) >= currentHeading)) {
             Serial.print("Turn Complete....Heading: ");Serial.println(currentHeading);
+            // setMotorSpeed(1500, 1500);
             turning = false;
         }
-        if (!AIMode) runningLoop();
+        if (!AIMode) {
+            turning = false;
+        }
+        checkBTStatus();
+        if (status == ACI_EVT_CONNECTED) {
+            sendBTInfo(getPingSensorValue(), currentHeading);
+        }
     }
 }
 //ch = CurrentHeading
@@ -252,8 +344,7 @@ int checkTurnDirection(int ch, int t2){
     } else if ((ch > t2) && ((ch - t2) > 180)) {
         return RIGHT;
     } else {
-        Serial.println("BROKEN");
-        return 0;
+        return BROKEN;
     }
 }
 int getRightDistance() {
@@ -299,15 +390,6 @@ int getPingSensorValue() {
     int dur = (int)duration / 29 / 2;
     return dur;
 }
-/*int getCurrentHeading() {
-    sensors_event_t event;
-    sensors_vec_t   orientation;
-    mag.getEvent(&event);
-    if (dof.magGetOrientation(SENSOR_AXIS_Z, &event, &orientation)) {
-      return orientation.heading;
-    }
-    return -1;
-}*/
 int getCurrentHeading() {
     sensors_event_t mag_event;
     sensors_event_t accel_event;
@@ -324,21 +406,23 @@ int getCurrentHeading() {
     }
 }
 int getAvgHeading() {
-    int myHeadings[5];
-    int avg;
-    for (int x = 0; x < 5; x++) {
+    int arraySize = 5;
+    int myHeadings[arraySize];
+    int avg = 0;
+    for (int x = 0; x < arraySize; x++) {
         myHeadings[x] = getCurrentHeading();
         delay(200);
     }
     Serial.print("Headings: {");
-    for (int x = 0; x < 4; x++) {
+    for (int x = 0; x < arraySize - 1; x++) {
         Serial.print(myHeadings[x]);Serial.print(", ");
     }
-    Serial.print(myHeadings[4]);Serial.println("}");
-    for (int x = 0; x < 5; x++) {
+    Serial.print(myHeadings[arraySize - 1]);Serial.println("}");
+    for (int x = 0; x < arraySize; x++) {
         avg = avg + myHeadings[x];
     }
-    return avg / 5;
+    avg = avg / arraySize;
+    return avg;
 }
 void printAccelInfo() {
     sensors_event_t accel_event;
