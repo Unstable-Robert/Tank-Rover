@@ -738,7 +738,7 @@ static BLEAdapter * _sharedBLEAdapter = nil;
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     if (!error) {
-        [[self delegate] OnWriteDataChanged:YES];
+        //[[self delegate] OnWriteDataChanged:YES];
     }
     else {
         NSLog([error localizedDescription]);

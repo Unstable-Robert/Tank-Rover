@@ -185,7 +185,7 @@ static NSString *UARTUUID = @"6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     NSArray *vals = [string componentsSeparatedByString:@","];
     CGFloat heading = [vals[0] integerValue];
     CGFloat pingSensor = [vals[1] integerValue];
-    [btValues setText:[NSString stringWithFormat:@"H: %f", heading]];
+    [btValues setText:[NSString stringWithFormat:@"H: %0.0f D: %0.0f", heading, pingSensor]];
     moveToHeading = heading;
 }
 - (void)sendDataString:(NSData *)tempData {

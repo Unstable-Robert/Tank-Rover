@@ -9,6 +9,8 @@
 #include <Adafruit_BMP085_U.h>
 #include <Adafruit_10DOF.h>
 
+#include <NewPing.h>
+
 #define ADAFRUITBLE_REQ 10
 #define ADAFRUITBLE_RDY 2
 #define ADAFRUITBLE_RST 9
@@ -37,6 +39,8 @@ Servo ps;
 Servo rm;
 Servo lm;
 
+NewPing pingSensor(PINGSENSOR, PINGSENSOR, 1000);
+
 aci_evt_opcode_t status;
 aci_evt_opcode_t laststatus = ACI_EVT_DISCONNECTED;
 int myBytes[2];
@@ -48,34 +52,51 @@ unsigned long previousMillis;
 long lastDebounceTime = 0;
 long debounceDelay = 300;
 boolean AIMode = false;
+boolean aiEnabled = false;
 
 Adafruit_BLE_UART BTLEserial = Adafruit_BLE_UART(ADAFRUITBLE_REQ, ADAFRUITBLE_RDY, ADAFRUITBLE_RST);
 
 void setup(void) {
+    digitalWrite(BLUELED, HIGH);
     attachInterrupt(1, buttonPressed, FALLING);
     Serial.begin(9600);
     while(!Serial);
+    digitalWrite(BLUELED, LOW);
+    delay(10);
+    digitalWrite(BLUELED, HIGH);
     Serial.println();
     startingUpCommand("Up");
     startingUpCommand("Swagger");
+    digitalWrite(BLUELED, LOW);
+    delay(10);
+    digitalWrite(BLUELED, HIGH);
     mag.begin();
     accel.begin();
     startingUpCommand("Dooms Day Weapon");
     BTLEserial.begin();
+    //BTLEserial.debugMode = false;
     pinMode(BLUELED, OUTPUT);
     startingUpCommand("Emotions");
     rm.attach(RIGHTMOTOR);
     lm.attach(LEFTMOTOR);
     ps.attach(PINGSERVO);
     ps.write(CENTER);
+    digitalWrite(BLUELED, LOW);
+    delay(10);
+    digitalWrite(BLUELED, HIGH);
     startingUpCommand("Facial Reconition");
     Serial.print("Done with Setup");
     delay(1000);
+    digitalWrite(BLUELED, LOW);
+    delay(10);
+    digitalWrite(BLUELED, HIGH);
+    digitalWrite(BLUELED, LOW);
+    delay(10);
+    digitalWrite(BLUELED, HIGH);
 }
 void startingUpCommand(String process) {
     Serial.print("Booting " + process + "..");
-    int length = process.length() + 10;
-    for (int x = length; x < 35; x++) {
+    for (int x = process.length(); x < 25; x++) {
         Serial.print(".");
         delay(250);
     }
@@ -84,12 +105,21 @@ void startingUpCommand(String process) {
 
 void loop() {
     // bostain();
-  // runningLoop();
+   runningLoop();
+  // testingPing();
   // testTurning();
   // testingCompass();
   // testingCompass2();
-  rectangle();
+  // rectangle();
   // delay(2000);
+}
+void testingPing() {
+    // NewPing sonar(PINGSENSOR, PINGSENSOR, 1000);
+    // long dis = sonar.ping_median(5);
+    // Serial.print("Time:");Serial.println(dis);
+    // Serial.print("Distance:");Serial.println(sonar.convert_cm(dis));
+    Serial.println(pingSensor.ping_cm());
+    delay(150);
 }
 void bostain() {
     int heading = getCurrentHeading();
@@ -219,8 +249,8 @@ void runningLoop() {
     if (distance < 30) {
         digitalWrite(BLUELED, HIGH);
         while(getPingSensorValue() < 40) {
-            Serial.println("<30 Backing up");
-            setMotorSpeed(1300, 1300);
+            Serial.print("<30 Backing up - ");Serial.println(distance);
+            setMotorSpeed(1700, 1700);
             delay(30);
         }
         setMotorSpeed(1500, 1500);
@@ -232,7 +262,7 @@ void runningLoop() {
     if (status == ACI_EVT_CONNECTED) {
         sendBTInfo(distance, getCurrentHeading());
         if (!AIMode) {
-        handlingBT();
+            handlingBT();
         } else {
         if (BTLEserial.available()){
             for (int x = 0; x < 2; x++) {
@@ -241,15 +271,16 @@ void runningLoop() {
                 previousMillis = currentMillis;
             }
             if (!AIMode) handlingBT();
-
         }
     }
   }
 }
 void buttonPressed() {
     if (millis() - lastDebounceTime > debounceDelay) {
-        AIMode = !AIMode;
-        Serial.print("ButtonPressed");Serial.println(AIMode);
+        if (aiEnabled) {
+            AIMode = !AIMode;
+            Serial.print("ButtonPressed");Serial.println(AIMode);
+        }
     }
     lastDebounceTime = millis();
     aiLED();
@@ -264,7 +295,7 @@ void aiLED() {
 void sendBTInfo(int dist, int heading) {
     if((currentMillis - prevMillis) > updateInterval) {
         prevMillis = currentMillis;
-        Serial.println("here");
+        //Serial.println("here");
         String send ="{" + String(heading) + ","+ String(dist) + "} ";
         uint8_t buf[send.length()];
         send.getBytes(buf, send.length());
@@ -368,27 +399,32 @@ int getLeftDistance() {
 }
 
 int getPingSensorDistance() {
-    int val1 = getPingSensorValue();
-    delay(300);
-    int val2 = getPingSensorValue();
-    delay(300);
-    int val3 = getPingSensorValue();
-    delay(300);
-    int val4 = getPingSensorValue();
-    delay(300);
-    int com = val1 + val2 + val3 + val4;
-    return com/4;
+    // int val1 = getPingSensorValue();
+    // delay(300);
+    // int val2 = getPingSensorValue();
+    // delay(300);
+    // int val3 = getPingSensorValue();
+    // delay(300);
+    // int val4 = getPingSensorValue();
+    // delay(300);
+    // int com = val1 + val2 + val3 + val4;
+    // return com/4;
+    long dis = pingSensor.ping_median(5);
+    return pingSensor.convert_cm(dis);
 }
 int getPingSensorValue() {
-    pinMode(PINGSENSOR, OUTPUT);
-    digitalWrite(PINGSENSOR, LOW);
-    delayMicroseconds(2);
-    digitalWrite(PINGSENSOR, HIGH);
-    delayMicroseconds(5);
-    pinMode(PINGSENSOR, INPUT);
-    long duration = pulseIn(PINGSENSOR,HIGH);
-    int dur = (int)duration / 29 / 2;
-    return dur;
+    // pinMode(PINGSENSOR, OUTPUT);
+    // digitalWrite(PINGSENSOR, LOW);
+    // delayMicroseconds(2);
+    // digitalWrite(PINGSENSOR, HIGH);
+    // delayMicroseconds(5);
+    // pinMode(PINGSENSOR, INPUT);
+    // long duration = pulseIn(PINGSENSOR,HIGH);
+    // int dur = (int)duration / 29 / 2;
+    // Serial.println(duration);
+    int ping = pingSensor.ping_cm();
+    //Serial.print("TestPing:");Serial.println(ping);
+    return ping;
 }
 int getCurrentHeading() {
     sensors_event_t mag_event;
@@ -449,6 +485,7 @@ int getRightHeading(int heading) { //add 90
 }
 
 void handlingBT() {
+    Serial.println("Got Message");
     if(currentMillis - previousMillis> interval) {
         previousMillis = currentMillis;
         interval = 3000;
@@ -476,6 +513,7 @@ void reverseFor(int time) {
 void checkBTStatus() {
     BTLEserial.pollACI();
     status = BTLEserial.getState();
+    //Serial.println(status);
     if (status != laststatus) {
     if (status == ACI_EVT_CONNECTED) {
       previousMillis = currentMillis;
@@ -483,6 +521,6 @@ void checkBTStatus() {
     if (status == ACI_EVT_DISCONNECTED) {
       setMotorSpeed(1500, 1500);
     }
-    laststatus = status;
+        laststatus = status;
     }
 }
