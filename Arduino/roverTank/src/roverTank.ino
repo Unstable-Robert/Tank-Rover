@@ -10,6 +10,7 @@
 #include <Adafruit_10DOF.h>
 
 #include <NewPing.h>
+#include <MahonyAHRS.h>
 
 #define ADAFRUITBLE_REQ 10
 #define ADAFRUITBLE_RDY 2
@@ -34,10 +35,25 @@
 Adafruit_10DOF                dof   = Adafruit_10DOF();
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
 Adafruit_LSM303_Mag_Unified   mag   = Adafruit_LSM303_Mag_Unified(30302);
-
+Adafruit_L3GD20_Unified       gyro  = Adafruit_L3GD20_Unified(20);
 Servo ps;
 Servo rm;
 Servo lm;
+
+// Offsets applied to raw x/y/z values
+float mag_offsets[3]            = { 3.36F, -13.07F, 1.25F };
+
+// Soft iron error compensation matrix
+float mag_softiron_matrix[3][3] = { { 0.999, 0.004, 0.009 },
+                                    { 0.004, 1.020, -0.003 },
+                                    { 0.009, -0.003, 0.982 } }; 
+
+float mag_field_strength        = 52.49F;
+
+// Mahony is lighter weight as a filter and should be used
+// on slower systems
+Mahony filter;
+
 
 NewPing pingSensor(PINGSENSOR, PINGSENSOR, 1000);
 
@@ -72,6 +88,7 @@ void setup(void) {
     digitalWrite(BLUELED, HIGH);
     mag.begin();
     accel.begin();
+    gyro.begin();
     startingUpCommand("Dooms Day Weapon");
     BTLEserial.begin();
     //BTLEserial.debugMode = false;
@@ -254,23 +271,23 @@ void runningLoop() {
             delay(30);
         }
         setMotorSpeed(1500, 1500);
-        if (AIMode) findNextDirection();
+        if (AIMode && aiEnabled) findNextDirection();
     } else {
-        if (AIMode) setMotorSpeed(1700, 1700);
+        if (AIMode && aiEnabled) setMotorSpeed(1700, 1700);
     }
     checkBTStatus();
     if (status == ACI_EVT_CONNECTED) {
         sendBTInfo(distance, getCurrentHeading());
-        if (!AIMode) {
+        if (!AIMode || !aiEnabled) {
             handlingBT();
         } else {
-        if (BTLEserial.available()){
-            for (int x = 0; x < 2; x++) {
-                myBytes[x] = BTLEserial.read();
-                if (myBytes[x] != 0x96) AIMode = false;
-                previousMillis = currentMillis;
-            }
-            if (!AIMode) handlingBT();
+            if (BTLEserial.available()){
+                for (int x = 0; x < 2; x++) {
+                    myBytes[x] = BTLEserial.read();
+                    if (myBytes[x] != 0x96) AIMode = false;
+                    previousMillis = currentMillis;
+                }
+                if (!AIMode && !aiEnabled) handlingBT();
         }
     }
   }
@@ -426,6 +443,7 @@ int getPingSensorValue() {
     //Serial.print("TestPing:");Serial.println(ping);
     return ping;
 }
+/* Not calibrated
 int getCurrentHeading() {
     sensors_event_t mag_event;
     sensors_event_t accel_event;
@@ -440,14 +458,49 @@ int getCurrentHeading() {
     } else {
         return -1;
     }
+}*/
+int getCurrentHeading() {
+    sensors_event_t gyro_event;
+    sensors_event_t accel_event;
+    sensors_event_t mag_event;
+
+    gyro.getEvent(&gyro_event);
+    accel.getEvent(&accel_event);
+    mag.getEvent(&mag_event);
+    // Apply mag offset compensation (base values in uTesla)
+    float x = mag_event.magnetic.x - mag_offsets[0];
+    float y = mag_event.magnetic.y - mag_offsets[1];
+    float z = mag_event.magnetic.z - mag_offsets[2];
+
+    // Apply mag soft iron error compensation
+    float mx = x * mag_softiron_matrix[0][0] + y * mag_softiron_matrix[0][1] + z * mag_softiron_matrix[0][2];
+    float my = x * mag_softiron_matrix[1][0] + y * mag_softiron_matrix[1][1] + z * mag_softiron_matrix[1][2];
+    float mz = x * mag_softiron_matrix[2][0] + y * mag_softiron_matrix[2][1] + z * mag_softiron_matrix[2][2];
+
+    // The filter library expects gyro data in degrees/s, but adafruit sensor
+    // uses rad/s so we need to convert them first (or adapt the filter lib
+    // where they are being converted)
+    float gx = gyro_event.gyro.x * 57.2958F;
+    float gy = gyro_event.gyro.y * 57.2958F;
+    float gz = gyro_event.gyro.z * 57.2958F;
+
+    // Update the filter
+    filter.update(gx, gy, gz,
+                    accel_event.acceleration.x, accel_event.acceleration.y, accel_event.acceleration.z,
+                    mx, my, mz);
+
+    float heading = filter.getYaw();
+    Serial.print("Current Heading:");Serial.println(heading);
+    return heading;
 }
 int getAvgHeading() {
-    int arraySize = 5;
+    return getCurrentHeading();
+    int arraySize = 2;
     int myHeadings[arraySize];
     int avg = 0;
     for (int x = 0; x < arraySize; x++) {
         myHeadings[x] = getCurrentHeading();
-        delay(200);
+        delay(50);
     }
     Serial.print("Headings: {");
     for (int x = 0; x < arraySize - 1; x++) {

@@ -1,10 +1,10 @@
 /***************************************************
   This is a library for the L3GD20 GYROSCOPE
 
-  Designed specifically to work with the Adafruit L3GD20 Breakout 
+  Designed specifically to work with the Adafruit L3GD20 Breakout
   ----> https://www.adafruit.com/products/1032
 
-  These sensors use I2C or SPI to communicate, 2 pins (I2C) 
+  These sensors use I2C or SPI to communicate, 2 pins (I2C)
   or 4 pins (SPI) are required to interface.
 
   Adafruit invests time and resources providing this open source code,
@@ -31,11 +31,12 @@
     -----------------------------------------------------------------------*/
     #define L3GD20_ADDRESS           (0x6B)        // 1101011
     #define L3GD20_POLL_TIMEOUT      (100)         // Maximum number of read attempts
-    #define L3GD20_ID                0xD4
-    #define L3GD20H_ID               0xD7
-    #define GYRO_SENSITIVITY_250DPS  (0.00875F)    // Roughly 22/256 for fixed point match
-    #define GYRO_SENSITIVITY_500DPS  (0.0175F)     // Roughly 45/256
-    #define GYRO_SENSITIVITY_2000DPS (0.070F)      // Roughly 18/256
+    #define L3GD20_ID                (0xD4)
+    #define L3GD20H_ID               (0xD7)
+    // Sesitivity values from the mechanical characteristics in the datasheet.
+    #define GYRO_SENSITIVITY_250DPS  (0.00875F)
+    #define GYRO_SENSITIVITY_500DPS  (0.0175F)
+    #define GYRO_SENSITIVITY_2000DPS (0.070F)
 /*=========================================================================*/
 
 /*=========================================================================
@@ -69,7 +70,7 @@
       GYRO_REGISTER_TSH_ZH              = 0x36,   // 00000000   rw
       GYRO_REGISTER_TSH_ZL              = 0x37,   // 00000000   rw
       GYRO_REGISTER_INT1_DURATION       = 0x38    // 00000000   rw
-    } gyroRegisters_t;    
+    } gyroRegisters_t;
 /*=========================================================================*/
 
 /*=========================================================================
@@ -83,6 +84,17 @@
     } gyroRange_t;
 /*=========================================================================*/
 
+/*=========================================================================
+    RAW GYROSCOPE DATA TYPE
+    -----------------------------------------------------------------------*/
+    typedef struct gyroRawData_s
+    {
+        int16_t x;
+        int16_t y;
+        int16_t z;
+    } gyroRawData_t;
+/*=========================================================================*/
+
 class Adafruit_L3GD20_Unified : public Adafruit_Sensor
 {
   public:
@@ -93,6 +105,8 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
     bool getEvent        ( sensors_event_t* );
     void getSensor       ( sensor_t* );
 
+    gyroRawData_t raw; /* Raw values from last sensor read */
+
   private:
     void        write8  ( byte reg, byte value );
     byte        read8   ( byte reg );
@@ -101,4 +115,35 @@ class Adafruit_L3GD20_Unified : public Adafruit_Sensor
     bool        _autoRangeEnabled;
 };
 
+/* Non Unified (old) driver for compatibility reasons */
+typedef gyroRange_t     l3gd20Range_t;
+typedef gyroRegisters_t l3gd20Registers_t;
+
+typedef struct l3gd20Data_s
+{
+  float x;
+  float y;
+  float z;
+} l3gd20Data;
+
+class Adafruit_L3GD20
+{
+  public:
+    Adafruit_L3GD20(int8_t cs, int8_t mosi, int8_t miso, int8_t clk);
+    Adafruit_L3GD20(void);
+
+    bool begin ( l3gd20Range_t rng=GYRO_RANGE_250DPS, byte addr=L3GD20_ADDRESS );
+    void read  ( void );
+
+    l3gd20Data data;    // Last read will be available here
+
+  private:
+    void write8     ( l3gd20Registers_t reg, byte value );
+    byte read8      ( l3gd20Registers_t reg );
+    uint8_t SPIxfer ( uint8_t x );
+
+    byte          address;
+    l3gd20Range_t range;
+    int8_t        _miso, _mosi, _clk, _cs;
+};
 #endif
