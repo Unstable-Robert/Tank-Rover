@@ -32,7 +32,7 @@ while JarvisRemote_Networking_Running:
         controller, cAddr = remoteControlSocket.accept()
         print(f"Connection from {cAddr}")
         controller.send("KEY".encode())
-        messageback = controller.recv(10).decode()
+        messageback = controller.recv(11).decode()
         print(messageback)
         isConnected = True
         while isConnected:

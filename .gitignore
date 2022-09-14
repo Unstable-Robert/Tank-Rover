@@ -6,3 +6,4 @@ Arduino/roverTank/src/.DS_Store
 Arduino/roverTank/src/.DS_Store
 /PythonController/.idea
 /PythonServer/.idea
+PythonController/__pycache__/ControllerThread.cpython-39.pyc
